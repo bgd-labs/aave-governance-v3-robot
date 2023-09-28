@@ -1,6 +1,6 @@
 # Aave Governance V3 Robot
 
-![robot_cover](https://github.com/bgd-labs/aave-governance-v3-robot/assets/22850280/a2c269dd-9260-4e00-840a-8673038e1c9e)
+![robot_cover](https://github.com/bgd-labs/aave-governance-v3-robot/assets/22850280/ac98574c-d4ec-4435-9886-f48ea6f9938e)
 
 This repository contains the smart contracts and backend for automating governance actions of Aave Governance V3 using Chainlink Automation and Chainlink API. Actions the robot executes on the governance contracts are also public and could be executed by anyone in a permissionless way.
 
