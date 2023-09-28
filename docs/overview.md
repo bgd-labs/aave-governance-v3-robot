@@ -2,7 +2,7 @@
 
 ## Proposal Lifecycle:
 
-![aave-gov-v3-flow](https://user-images.githubusercontent.com/22850280/229082484-3ca70351-ccfc-45cf-9a23-4e06be0c78c3.jpeg)
+<img src="./gov-v3-flow.jpg" alt="Aave Governance v3 Flow" width="100%" height="100%">
 
 You can find more information on the proposal lifecycle [here](https://github.com/bgd-labs/aave-governance-v3#new-proposal-lifecycle).
 
