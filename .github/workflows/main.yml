@@ -1,0 +1,13 @@
+name: Main workflow
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@431abeb113bf292f2033681093f2b2d1bd971b72
+    secrets: inherit
