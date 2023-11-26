@@ -36,3 +36,6 @@ deploy-optimism-execution-keeper :; forge script ./scripts/ExecutionChainRobotKe
 
 # Arbitrum deployments
 deploy-arbitrum-execution-keeper :; forge script ./scripts/ExecutionChainRobotKeeper.s.sol:DeployArbitrum --rpc-url arbitrum --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_ARBITRUM} --gas-estimate-multiplier 175 --verify -vvvv
+
+# Bnb deployments
+deploy-bnb-execution-keeper :; forge script ./scripts/ExecutionChainRobotKeeper.s.sol:DeployBnb --rpc-url bnb --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_ARBITRUM} --gas-estimate-multiplier 175 --verify -vvvv

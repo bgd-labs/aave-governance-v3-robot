@@ -21,6 +21,7 @@ All the information about the setup of the project and deployments can be found 
 | Avalanche | [0x7B74938583Eb03e06042fcB651046BaF0bf15644](https://snowtrace.io/address/0x7B74938583Eb03e06042fcB651046BaF0bf15644) | [0x10E49034306EaA663646773C04b7B67E81eD0D52](https://snowtrace.io/address/0x10E49034306EaA663646773C04b7B67E81eD0D52) | [0x6264E51782D739caf515a1Bd4F9ae6881B58621b](https://snowtrace.io/address/0x6264E51782D739caf515a1Bd4F9ae6881B58621b) | - |
 | Arbitrum | [0x64093fe5f8cf62afb4377cf7ef4373537fe9155b](https://arbiscan.io/address/0x64093fe5f8cf62afb4377cf7ef4373537fe9155b) | - | - | - |
 | Optimism | [0xa0195539e21A6553243344A3BE6b874B5d3EC7b9](https://optimistic.etherscan.io/address/0xa0195539e21A6553243344A3BE6b874B5d3EC7b9) | - | - | - |
+| Bnb | [0x870F5EBf5C13B73251283b2d883988066e2bb732](https://bscscan.com/address/0x870F5EBf5C13B73251283b2d883988066e2bb732) | - | - | - |
 
 ## License
 
