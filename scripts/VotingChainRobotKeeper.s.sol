@@ -90,7 +90,7 @@ contract DeployMainnet is Script {
     vm.startBroadcast();
     keeper = new VotingChainRobotKeeper(
       GovernanceV3Ethereum.VOTING_MACHINE,
-      0xe3FD707583932a99513a5c65c8463De769f5DAdF // rootsConsumer
+      0x2fA6F0A65886123AFD24A575aE4554d0FCe8B577 // rootsConsumer
     );
 
     console.log('Voting chain mainnet keeper address', address(keeper));
