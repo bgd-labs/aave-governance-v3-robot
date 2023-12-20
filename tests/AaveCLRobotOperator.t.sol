@@ -10,16 +10,16 @@ import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 
 contract AaveCLRobotOperatorTest is Test {
   AaveCLRobotOperator public aaveCLRobotOperator;
-  address constant LINK_WHALE = 0xF977814e90dA44bFA03b6295A0616a897441aceC;
-  IERC20 constant LINK_TOKEN = IERC20(0x514910771AF9Ca656af840dff83E8264EcF986CA);
+  address constant LINK_WHALE = 0x6CFb6d2Ce675fA03B2E629771c37c8869d7CA2f8;
+  IERC20 constant LINK_TOKEN = IERC20(0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196);
   address constant WITHDRAW_ADDRESS = address(2);
-  address constant REGISTRY = 0x6593c7De001fC8542bB1703532EE1E5aA0D458fD;
-  address constant REGISTRAR = 0x6B0B234fB2f380309D47A7E9391E29E9a179395a;
+  address constant REGISTRY = 0xE226D5aCae908252CcA3F6CEFa577527650a9e1e;
+  address constant REGISTRAR = 0xD8983a340A96b9C2Bb6855E46847aE134Db71fB1;
 
   function setUp() public {
     vm.createSelectFork(
-      'mainnet',
-      18821472 // Dec-19-2023
+      'base',
+      8143141 // Dec-19-2023
     );
     aaveCLRobotOperator = new AaveCLRobotOperator(
       REGISTRY,
@@ -43,7 +43,7 @@ contract AaveCLRobotOperatorTest is Test {
   }
 
   function testRegister_EventTypeKeeper() public {
-    vm.startPrank(0xcc4b5b07316Be81ED6edB44Ca61E4CaB28A1950D); // REGISTRAR_OWNER
+    vm.startPrank(0x8fA510072009E71CfD447169AB5A84cAc394f58A); // REGISTRAR_OWNER
     IKeeperRegistrar(REGISTRAR).setAutoApproveAllowedSender(address(aaveCLRobotOperator), true);
     vm.stopPrank();
 
