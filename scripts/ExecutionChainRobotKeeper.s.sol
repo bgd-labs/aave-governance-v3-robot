@@ -3,13 +3,16 @@ pragma solidity ^0.8.0;
 
 import {Script} from 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
-import {ExecutionChainRobotKeeper} from '../src/contracts/ExecutionChainRobotKeeper.sol';
+import {ExecutionChainRobotKeeper} from 'src/contracts/ExecutionChainRobotKeeper.sol';
+import {ExecutionChainRobotKeeper as ExecutionChainRobotKeeperGelato} from 'src/contracts/gelato/ExecutionChainRobotKeeper.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {GovernanceV3BNB} from 'aave-address-book/GovernanceV3BNB.sol';
+import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
+import {GovernanceV3Gnosis} from 'aave-address-book/GovernanceV3Gnosis.sol';
 
 contract DeployFuji is Script {
   ExecutionChainRobotKeeper public keeper;
@@ -139,6 +142,30 @@ contract DeployBnb is Script {
     keeper = new ExecutionChainRobotKeeper(address(GovernanceV3BNB.PAYLOADS_CONTROLLER));
 
     console.log('Execution chain bnb keeper address', address(keeper));
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployBase is Script {
+  ExecutionChainRobotKeeper public keeper;
+
+  function run() external {
+    vm.startBroadcast();
+    keeper = new ExecutionChainRobotKeeper(address(GovernanceV3Base.PAYLOADS_CONTROLLER));
+
+    console.log('Execution chain base keeper address', address(keeper));
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployGnosis is Script {
+  ExecutionChainRobotKeeperGelato public keeper;
+
+  function run() external {
+    vm.startBroadcast();
+    keeper = new ExecutionChainRobotKeeperGelato(address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER));
+
+    console.log('Execution chain gnosis keeper address', address(keeper));
     vm.stopBroadcast();
   }
 }
