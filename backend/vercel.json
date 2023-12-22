@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/KeeperBalance.ts",
+      "schedule": "0 0 * * *"
+    }
+  ],
   "routes": [
     {
       "src": "/api/roots",

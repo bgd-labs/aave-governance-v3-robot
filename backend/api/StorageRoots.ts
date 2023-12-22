@@ -10,7 +10,12 @@ import {
   getSolidityStorageSlotBytes,
   prepareBlockRLP,
 } from '../libs/ProofsHelper';
-import {AaveSafetyModule, AaveV3Ethereum, GovernanceV3Ethereum, AaveMisc} from '@bgd-labs/aave-address-book';
+import {
+  AaveSafetyModule,
+  AaveV3Ethereum,
+  GovernanceV3Ethereum,
+  AaveMisc,
+} from '@bgd-labs/aave-address-book';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
