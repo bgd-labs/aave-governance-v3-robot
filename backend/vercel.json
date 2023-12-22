@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/KeeperBalance.ts",
+      "path": "/api/KeeperAlerts.ts",
       "schedule": "0 0 * * *"
     }
   ],

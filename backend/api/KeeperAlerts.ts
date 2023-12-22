@@ -3,6 +3,7 @@ import {WebClient, LogLevel} from '@slack/web-api';
 import {ethers} from 'ethers';
 import {keeperRegistryAbi} from '../abi/KeeperRegistry.json';
 import {keeperRegistry_2_1_Abi} from '../abi/KeeperRegistry2_1.json';
+import {keeperTargetAbi} from '../abi/KeeperTarget.json';
 
 const client = new WebClient(process.env.SLACK_TOKEN, {
   logLevel: LogLevel.DEBUG,
@@ -60,6 +61,13 @@ export default async function handler(request: VercelRequest, response: VercelRe
         network,
         config[network].registryVersion
       );
+
+      await checkAndSendMaxGasAlert(
+        config[network].id,
+        config[network].registry,
+        network,
+        config[network].registryVersion
+      );
     }
     response.json({success: true});
   } catch (error) {
@@ -83,7 +91,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
     const keeperInfo = await registryContract.getUpkeep(keeperId);
     const minimumBalance = await registryContract.getMinBalanceForUpkeep(keeperId);
 
-    if (ethers.BigNumber.from(keeperInfo.balance).gt(ethers.BigNumber.from(minimumBalance))) {
+    if (ethers.BigNumber.from(keeperInfo.balance).lt(ethers.BigNumber.from(minimumBalance))) {
       await client.chat.postMessage({
         channel: channelId,
         blocks: [
@@ -132,6 +140,70 @@ export default async function handler(request: VercelRequest, response: VercelRe
           },
         ],
       });
+    }
+  }
+
+  async function checkAndSendMaxGasAlert(
+    keeperId: string,
+    keeperRegistry: string,
+    network: string,
+    registryVersion: number
+  ) {
+    const provider = new ethers.providers.JsonRpcProvider(getNetworkRpcUrl(network));
+    const registryContract = new ethers.Contract(
+      keeperRegistry,
+      registryVersion == 1 ? keeperRegistryAbi : keeperRegistry_2_1_Abi,
+      provider
+    );
+
+    const keeperInfo = await registryContract.getUpkeep(keeperId);
+    const maxGasLimit = registryVersion == 1 ? keeperInfo.executeGas : keeperInfo.performGas;
+    const keeperTarget = new ethers.Contract(
+      keeperInfo.target,
+      keeperTargetAbi,
+      provider
+    );
+
+    const checkData = await keeperTarget.checkUpkeep('0x');
+    if (checkData[0] == true && checkData[1]) {
+      const gasEstimation = await keeperTarget.estimateGas.performUpkeep(`${checkData[1]}`);
+
+      if (gasEstimation.gt(5_000_000)) {
+        await client.chat.postMessage({
+          channel: channelId,
+          blocks: [
+            {
+              type: 'header',
+              text: {
+                type: 'plain_text',
+                text: `${
+                  network.charAt(0).toUpperCase() + network.slice(1)
+                } Payload Execution Gas Limit Exceeded :alert:`,
+                emoji: true,
+              },
+            },
+            {
+              type: 'divider',
+            },
+            {
+              type: 'section',
+              fields: [
+                {
+                  type: 'mrkdwn',
+                  text: `Execution exceeds max gas limit configured for the keeper, please execute the payload manually`,
+                },
+                {
+                  type: 'mrkdwn',
+                  text: `*Gas Limit:*\n ${maxGasLimit}`,
+                }
+              ],
+            },
+            {
+              type: 'divider',
+            },
+          ],
+        });
+      }
     }
   }
 
