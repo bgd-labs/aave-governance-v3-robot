@@ -13,8 +13,7 @@ import {
 import {
   AaveSafetyModule,
   AaveV3Ethereum,
-  GovernanceV3Ethereum,
-  AaveMisc,
+  GovernanceV3Ethereum
 } from '@bgd-labs/aave-address-book';
 
 Sentry.init({
@@ -28,7 +27,7 @@ export default async function StorageRoots(request: VercelRequest, response: Ver
     const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_MAINNET);
 
     const aAaveActiveAddress = '0x329c54289Ff5D6B7b7daE13592C6B1EDA1543eD4';
-    const aaveActiveAddress = AaveMisc.AAVE_ECOSYSTEM_RESERVE_CONTROLLER;
+    const aaveActiveAddress = '0x25F2226B597E8F9514B3F68F00f494cF4f286491'; // ECOSYSTEM_RESERVE
     const aaveAddress = AaveV3Ethereum.ASSETS.AAVE.UNDERLYING;
     const stkAaveAddress = AaveSafetyModule.STK_AAVE;
     const aAaveAddress = AaveV3Ethereum.ASSETS.AAVE.A_TOKEN;
