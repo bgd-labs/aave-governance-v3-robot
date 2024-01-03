@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/KeeperAlerts.ts",
+      "schedule": "0 0 * * *"
+    }
+  ],
   "routes": [
     {
       "src": "/api/roots",
