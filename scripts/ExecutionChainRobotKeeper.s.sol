@@ -13,6 +13,7 @@ import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {GovernanceV3BNB} from 'aave-address-book/GovernanceV3BNB.sol';
 import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {GovernanceV3Gnosis} from 'aave-address-book/GovernanceV3Gnosis.sol';
+import {GovernanceV3Scroll} from 'aave-address-book/GovernanceV3Scroll.sol';
 
 contract DeployFuji is Script {
   ExecutionChainRobotKeeper public keeper;
@@ -166,6 +167,18 @@ contract DeployGnosis is Script {
     keeper = new ExecutionChainRobotKeeperGelato(address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER));
 
     console.log('Execution chain gnosis keeper address', address(keeper));
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployScroll is Script {
+  ExecutionChainRobotKeeperGelato public keeper;
+
+  function run() external {
+    vm.startBroadcast();
+    keeper = new ExecutionChainRobotKeeperGelato(address(GovernanceV3Scroll.PAYLOADS_CONTROLLER));
+
+    console.log('Execution chain scroll keeper address', address(keeper));
     vm.stopBroadcast();
   }
 }

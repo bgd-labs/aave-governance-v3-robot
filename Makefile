@@ -46,3 +46,6 @@ deploy-base-execution-keeper :; forge script ./scripts/ExecutionChainRobotKeeper
 
 # Gnosis deployments
 deploy-gnosis-execution-keeper :; forge script ./scripts/ExecutionChainRobotKeeper.s.sol:DeployGnosis --rpc-url gnosis --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_GNOSIS} --gas-estimate-multiplier 175 --verify -vvvv
+
+# Scroll deployments
+deploy-scroll-execution-keeper :; forge script ./scripts/ExecutionChainRobotKeeper.s.sol:DeployScroll --rpc-url scroll --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_SCROLL} --gas-estimate-multiplier 175 --verify -vvvv

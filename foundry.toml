@@ -34,6 +34,7 @@ goerli = "${RPC_GOERLI}"
 fuji = "${RPC_FUJI}"
 mumbai = "${RPC_MUMBAI}"
 bnb_testnet = "${RPC_BNB_TESTNET}"
+scroll = "${RPC_SCROLL}"
 
 [etherscan]
 mainnet={key="${ETHERSCAN_API_KEY_MAINNET}",chainId=1}
@@ -50,5 +51,6 @@ fantom={key="${ETHERSCAN_API_KEY_FANTOM}",chainId=250}
 goerli={key="${ETHERSCAN_API_KEY_GOERLI}",chainId=5}
 sepolia={key="${ETHERSCAN_API_KEY_SEPOLIA}",chainId=11155111}
 fuji={key="${ETHERSCAN_API_KEY_FUJI}",chainId=43113}
+scroll={key="${ETHERSCAN_API_KEY_SCROLL}",chainId=534352}
 
 # See more config options https://github.com/gakonst/foundry/tree/master/config
