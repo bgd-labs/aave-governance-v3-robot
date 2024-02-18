@@ -15,7 +15,7 @@ export const getBlockNumberByHash = async (
   blockHash: string
 ): Promise<number> => {
   const block = await provider.send('eth_getBlockByHash', [
-    ethers.utils.hexValue(blockHash),
+    blockHash,
     false,
   ]);
   return block.number;
