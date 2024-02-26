@@ -10,6 +10,7 @@ import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol
 import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {GovernanceV3BNB} from 'aave-address-book/GovernanceV3BNB.sol';
+import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 
 contract DeployFuji is Script {
   ExecutionChainRobotKeeper public keeper;
@@ -139,6 +140,18 @@ contract DeployBnb is Script {
     keeper = new ExecutionChainRobotKeeper(address(GovernanceV3BNB.PAYLOADS_CONTROLLER));
 
     console.log('Execution chain bnb keeper address', address(keeper));
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployBase is Script {
+  ExecutionChainRobotKeeper public keeper;
+
+  function run() external {
+    vm.startBroadcast();
+    keeper = new ExecutionChainRobotKeeper(address(GovernanceV3Base.PAYLOADS_CONTROLLER));
+
+    console.log('Execution chain base keeper address', address(keeper));
     vm.stopBroadcast();
   }
 }
