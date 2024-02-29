@@ -22,6 +22,8 @@ All the information about the setup of the project and deployments can be found 
 | Arbitrum | [0x64093fe5f8cf62afb4377cf7ef4373537fe9155b](https://arbiscan.io/address/0x64093fe5f8cf62afb4377cf7ef4373537fe9155b) | - | - | - |
 | Optimism | [0xa0195539e21A6553243344A3BE6b874B5d3EC7b9](https://optimistic.etherscan.io/address/0xa0195539e21A6553243344A3BE6b874B5d3EC7b9) | - | - | - |
 | Bnb | [0x870F5EBf5C13B73251283b2d883988066e2bb732](https://bscscan.com/address/0x870F5EBf5C13B73251283b2d883988066e2bb732) | - | - | - |
+| Gnosis | [0xABcaf379C31626190F275f9a5Ba5d6ebf19F9903](https://gnosisscan.io/address/0xABcaf379C31626190F275f9a5Ba5d6ebf19F9903) | - | - | - |
+| Base | [0xdb93e2712a8B36835078f8D28c70fCC95FD6d37c](https://basescan.org/address/0xdb93e2712a8B36835078f8D28c70fCC95FD6d37c) | - | - | - |
 
 ## License
 
