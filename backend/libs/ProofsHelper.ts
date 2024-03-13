@@ -54,8 +54,12 @@ export function prepareBlockRLP(rawBlock: any) {
     rawBlock.nonce,
     BigNumber.from(rawBlock.baseFeePerGas).toHexString(),
     rawBlock.withdrawalsRoot,
-    BigNumber.from(rawBlock.blobGasUsed).toHexString(),
-    BigNumber.from(rawBlock.excessBlobGas).toHexString(),
+    BigNumber.from(rawBlock.blobGasUsed).isZero()
+      ? "0x"
+      : BigNumber.from(rawBlock.blobGasUsed).toHexString(),
+    BigNumber.from(rawBlock.excessBlobGas)
+      ? "0x"
+      : BigNumber.from(rawBlock.excessBlobGas).toHexString(),
     rawBlock.parentBeaconBlockRoot
   ];
   return ethers.utils.RLP.encode(rawData);

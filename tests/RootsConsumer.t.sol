@@ -16,7 +16,7 @@ contract RootsConsumerTest is Test {
 
   address constant CHAINLINK_OPERATOR = address(12);
   address constant WITHDRAWAL_ADDRESS = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
-  bytes32 constant BLOCKHASH = 0xb2321db43fec13ba9d0f2c43390cc0782a73102e5b0a3ba51d89c66a531165fc; // mainnet
+  bytes32 constant BLOCKHASH = 0x3ea2216feb32bf585b48d93324579120ef2dd1c3d60d03ffb2e88f7e7238d281; // mainnet
   bytes32 constant STK_AAVE_SLOT =
     0x0000000000000000000000000000000000000000000000000000000000000051;
 
