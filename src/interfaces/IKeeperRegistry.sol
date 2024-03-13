@@ -102,4 +102,10 @@ interface IKeeperRegistry {
   function upkeepVersion() external pure returns (uint8);
 
   function withdrawFunds(uint256 id, address to) external;
+
+  function migrateUpkeeps(uint256[] calldata upkeepIDs, address destination) external;
+
+  function transferUpkeepAdmin(uint256 id, address proposed) external;
+
+  function acceptUpkeepAdmin(uint256 id) external;
 }
