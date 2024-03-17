@@ -57,7 +57,7 @@ export function prepareBlockRLP(rawBlock: any) {
     BigNumber.from(rawBlock.blobGasUsed).isZero()
       ? "0x"
       : BigNumber.from(rawBlock.blobGasUsed).toHexString(),
-    BigNumber.from(rawBlock.excessBlobGas)
+    BigNumber.from(rawBlock.excessBlobGas).isZero()
       ? "0x"
       : BigNumber.from(rawBlock.excessBlobGas).toHexString(),
     rawBlock.parentBeaconBlockRoot
