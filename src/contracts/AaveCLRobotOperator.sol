@@ -9,6 +9,7 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
+import {EnumerableSet} from 'solidity-utils/contracts/oz-common/EnumerableSet.sol';
 
 /**
  * @title AaveCLRobotOperator
@@ -19,8 +20,11 @@ import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initiali
  */
 contract AaveCLRobotOperator is OwnableWithGuardian, Initializable, IAaveCLRobotOperator {
   using SafeERC20 for IERC20;
+  using EnumerableSet for EnumerableSet.UintSet;
 
-  uint256[] internal _keepersList;
+  // stores the keepers registered which are not in cancelled state by the operator contract.
+  EnumerableSet.UintSet internal _keepers;
+
   mapping(uint256 id => KeeperInfo) internal _keepersInfo;
 
   address internal _keeperRegistry;
@@ -74,7 +78,7 @@ contract AaveCLRobotOperator is OwnableWithGuardian, Initializable, IAaveCLRobot
     if (id != 0) {
       _keepersInfo[id].upkeep = upkeepContract;
       _keepersInfo[id].name = name;
-      _keepersList.push(id);
+      _keepers.add(id);
 
       emit KeeperRegistered(id, upkeepContract, amountToFund);
 
@@ -87,15 +91,7 @@ contract AaveCLRobotOperator is OwnableWithGuardian, Initializable, IAaveCLRobot
   /// @inheritdoc IAaveCLRobotOperator
   function cancel(uint256 id) external onlyOwner {
     IKeeperRegistry(_keeperRegistry).cancelUpkeep(id);
-
-    // remove the keeper from the keepers list
-    for (uint256 index = 0; index < _keepersList.length; index++) {
-      if (_keepersList[index] == id) {
-        _keepersList[index] = _keepersList[_keepersList.length - 1];
-        _keepersList.pop();
-        break;
-      }
-    }
+    _keepers.remove(id);
 
     emit KeeperCancelled(id, _keepersInfo[id].upkeep);
   }
@@ -129,11 +125,11 @@ contract AaveCLRobotOperator is OwnableWithGuardian, Initializable, IAaveCLRobot
 
   /// @inheritdoc IAaveCLRobotOperator
   function migrate(address newRegistry, address newRegistrar) external onlyOwner {
-    IKeeperRegistry(_keeperRegistry).migrateUpkeeps(_keepersList, newRegistry);
+    IKeeperRegistry(_keeperRegistry).migrateUpkeeps(_keepers.values(), newRegistry);
 
     setRegistry(newRegistry);
     setRegistrar(newRegistrar);
-    emit KeepersMigrated(_keepersList, newRegistry, newRegistrar);
+    emit KeepersMigrated(_keepers.values(), newRegistry, newRegistrar);
   }
 
   /// @inheritdoc IAaveCLRobotOperator
@@ -193,7 +189,7 @@ contract AaveCLRobotOperator is OwnableWithGuardian, Initializable, IAaveCLRobot
 
   /// @inheritdoc IAaveCLRobotOperator
   function getKeepersList() public view returns (uint256[] memory) {
-    return _keepersList;
+    return _keepers.values();
   }
 
   /// @inheritdoc IAaveCLRobotOperator

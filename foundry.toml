@@ -12,7 +12,7 @@ remappings = [
   'aave-governance-v3/=lib/aave-governance-v3/',
   'aave-address-book/=lib/aave-address-book/src/',
   'aave-delivery-infrastructure/=lib/aave-governance-v3/lib/aave-delivery-infrastructure/src/',
-  'solidity-utils/=lib/aave-governance-v3/lib/solidity-utils/src/',
+  'solidity-utils/=lib/solidity-utils/src/',
   'aave-token-v3/=lib/aave-governance-v3/lib/aave-token-v3/src/'
 ]
 fs_permissions = [{access = "write", path = "./reports"}]

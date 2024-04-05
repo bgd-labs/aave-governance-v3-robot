@@ -251,15 +251,15 @@ contract AaveCLRobotOperatorTest is Test {
     vm.prank(GovernanceV3Optimism.EXECUTOR_LVL_1);
     aaveCLRobotOperator.setRegistry(OLD_REGISTRY);
 
-    // modify and append keeperId on _keepersList, this is mock an already registered keeper to be registered by
+    // modify and append keeperId on _keepers, this is mock an already registered keeper to be registered by
     // the robot operator contract in order to test migration it to new registry
     uint256 id = 38016904744371718141567798635089231439311935855515862823520872759101042183005;
     uint256 arrayLength = 1;
-    uint256 keepersListStorageSlot = 2;
-    vm.store(address(aaveCLRobotOperator), bytes32(keepersListStorageSlot), bytes32(arrayLength));
+    uint256 keepersStorageSlot = 2;
+    vm.store(address(aaveCLRobotOperator), bytes32(keepersStorageSlot), bytes32(arrayLength));
     vm.store(
       address(aaveCLRobotOperator),
-      bytes32(_arrayLocation(keepersListStorageSlot, 0)),
+      bytes32(_arrayLocation(keepersStorageSlot, 0)),
       bytes32(id)
     );
 
