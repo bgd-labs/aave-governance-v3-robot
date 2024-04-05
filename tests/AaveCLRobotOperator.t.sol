@@ -24,6 +24,11 @@ contract AaveCLRobotOperatorTest is Test {
   address constant OLD_REGISTRAR = 0x4F3AF332A30973106Fe146Af0B4220bBBeA748eC;
 
   event KeeperCancelled(uint256 indexed id, address indexed upkeep);
+  event KeepersMigrated(
+    uint256[] indexed ids,
+    address indexed newKeeperRegistry,
+    address indexed newKeeperRegistrar
+  );
 
   function setUp() public {
     vm.createSelectFork(
@@ -272,6 +277,9 @@ contract AaveCLRobotOperatorTest is Test {
 
     uint256[] memory idsToMigrate = new uint256[](1);
     idsToMigrate[0] = id;
+
+    vm.expectEmit();
+    emit KeepersMigrated(idsToMigrate, REGISTRY, REGISTRAR);
 
     vm.prank(GovernanceV3Optimism.EXECUTOR_LVL_1);
     aaveCLRobotOperator.migrate(REGISTRY, REGISTRAR);
