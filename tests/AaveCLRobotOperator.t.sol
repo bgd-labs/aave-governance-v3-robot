@@ -3,10 +3,11 @@ pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
 import {AaveCLRobotOperator, IKeeperRegistrar} from '../src/contracts/AaveCLRobotOperator.sol';
-import {ExecutionChainRobotKeeper} from '../src/contracts/ExecutionChainRobotKeeper.sol';
+import {ExecutionChainRobot} from '../src/contracts/ExecutionChainRobot.sol';
 import {IKeeperRegistry} from '../src/interfaces/IKeeperRegistry.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
+import {MockAggregator} from 'chainlink/src/v0.8/mocks/MockAggregator.sol';
 
 contract AaveCLRobotOperatorTest is Test {
   AaveCLRobotOperator public aaveCLRobotOperator;
@@ -54,8 +55,9 @@ contract AaveCLRobotOperatorTest is Test {
 
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
     LINK_TOKEN.approve(address(aaveCLRobotOperator), 100 ether);
-    ExecutionChainRobotKeeper ethRobotKeeper = new ExecutionChainRobotKeeper(
-      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
+    ExecutionChainRobot ethRobotKeeper = new ExecutionChainRobot(
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER),
+      address(new MockAggregator())
     );
     uint256 id = aaveCLRobotOperator.register(
       'testName',
@@ -193,8 +195,9 @@ contract AaveCLRobotOperatorTest is Test {
 
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
     LINK_TOKEN.approve(address(aaveCLRobotOperator), 100 ether);
-    ExecutionChainRobotKeeper ethRobotKeeper = new ExecutionChainRobotKeeper(
-      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
+    ExecutionChainRobot ethRobotKeeper = new ExecutionChainRobot(
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER),
+      address(new MockAggregator())
     );
     uint256 id = aaveCLRobotOperator.register(
       'testName',

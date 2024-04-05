@@ -5,12 +5,13 @@ import {IRootsConsumer} from '../interfaces/IRootsConsumer.sol';
 import {IVotingStrategy} from 'aave-governance-v3/src/contracts/voting/interfaces/IVotingStrategy.sol';
 import {IVotingMachineWithProofs} from 'aave-governance-v3/src/contracts/voting/interfaces/IVotingMachineWithProofs.sol';
 import {IDataWarehouse} from 'aave-governance-v3/src/contracts/voting/DataWarehouse.sol';
-import {IVotingChainRobotKeeper, AutomationCompatibleInterface} from '../interfaces/IVotingChainRobotKeeper.sol';
+import {IVotingChainRobot, AutomationCompatibleInterface} from '../interfaces/IVotingChainRobot.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {AggregatorInterface} from 'aave-address-book/AaveV3.sol';
 
 /**
- * @title VotingChainRobotKeeper
+ * @title VotingChainRobot
  * @author BGD Labs
  * @notice Contract to perform automation on voting machine and data warehouse contract for goveranance v3.
  * @dev Aave chainlink automation-keeper-compatible contract to:
@@ -18,31 +19,35 @@ import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
  *        if roots needs to be submitted on the data warehouse.
  *      - Calls createVote and closeAndSendVote, submits roots if all the conditions are met.
  */
-contract VotingChainRobotKeeper is Ownable, IVotingChainRobotKeeper {
-  /// @inheritdoc IVotingChainRobotKeeper
+contract VotingChainRobot is Ownable, IVotingChainRobot {
+  /// @inheritdoc IVotingChainRobot
   address public immutable VOTING_MACHINE;
 
-  /// @inheritdoc IVotingChainRobotKeeper
+  /// @inheritdoc IVotingChainRobot
   address public immutable VOTING_STRATEGY;
 
-  /// @inheritdoc IVotingChainRobotKeeper
+  /// @inheritdoc IVotingChainRobot
   address public immutable ROOTS_CONSUMER;
 
-  /// @inheritdoc IVotingChainRobotKeeper
+  /// @inheritdoc IVotingChainRobot
   address public immutable DATA_WAREHOUSE;
 
+  /// @inheritdoc IVotingChainRobot
+  AggregatorInterface public immutable CHAINLINK_FAST_GAS_ORACLE;
+
+  uint256 internal _maxGasPrice;
   mapping(uint256 => bool) internal _disabledProposals;
   mapping(bytes32 => bool) internal _rootsSubmitted;
 
   /**
-   * @inheritdoc IVotingChainRobotKeeper
+   * @inheritdoc IVotingChainRobot
    * @dev maximum number of actions that can be performed by the keeper in one performUpkeep.
    *      we only perform a max of 5 actions in one performUpkeep as the gas consumption would be quite high otherwise.
    */
   uint256 public constant MAX_ACTIONS = 5;
 
   /**
-   * @inheritdoc IVotingChainRobotKeeper
+   * @inheritdoc IVotingChainRobot
    * @dev size of the proposal list to fetch from last/latest to check if an action could be performed upon.
    *      we fetch the last 20 proposal and check to be very sure that no proposal is being unchecked.
    */
@@ -53,15 +58,18 @@ contract VotingChainRobotKeeper is Ownable, IVotingChainRobotKeeper {
   /**
    * @param votingMachine address of the voting machine contract.
    * @param rootsConsumer address of the roots consumer contract to registers the roots.
+   * @param chainlinkFastGasOracle address of the chainlink fast gas oracle contract.
    */
   constructor(
     address votingMachine,
-    address rootsConsumer
+    address rootsConsumer,
+    address chainlinkFastGasOracle
   ) {
     VOTING_MACHINE = votingMachine;
     ROOTS_CONSUMER = rootsConsumer;
     VOTING_STRATEGY = address(IVotingMachineWithProofs(VOTING_MACHINE).VOTING_STRATEGY());
     DATA_WAREHOUSE = address(IVotingMachineWithProofs(VOTING_MACHINE).DATA_WAREHOUSE());
+    CHAINLINK_FAST_GAS_ORACLE = AggregatorInterface(chainlinkFastGasOracle);
   }
 
   /**
@@ -75,6 +83,8 @@ contract VotingChainRobotKeeper is Ownable, IVotingChainRobotKeeper {
     bool canVotingActionBePerformed;
     uint256 actionsCount;
     uint256 skip;
+
+    if (!isGasPriceInRange()) return (false, '');
 
     // we fetch the proposal list from the last/latest proposalId till the SIZE, and check if any action could be performed.
     // in case any voting action can be performed, we fetch the proposal list again, starting from (latest proposalId - SIZE) till
@@ -156,22 +166,40 @@ contract VotingChainRobotKeeper is Ownable, IVotingChainRobotKeeper {
     if (!isActionPerformed) revert NoActionCanBePerformed();
   }
 
-  /// @inheritdoc IVotingChainRobotKeeper
-  function isDisabled(uint256 id) public view returns (bool) {
-    return _disabledProposals[id];
-  }
-
-  /// @inheritdoc IVotingChainRobotKeeper
+  /// @inheritdoc IVotingChainRobot
   function toggleDisableAutomationById(uint256 id) external onlyOwner {
     _disabledProposals[id] = !_disabledProposals[id];
   }
 
-  /// @inheritdoc IVotingChainRobotKeeper
+  /// @inheritdoc IVotingChainRobot
   function retrySubmitRoots(uint256 proposalId) external onlyOwner {
     IVotingMachineWithProofs.ProposalVoteConfiguration memory voteConfig = IVotingMachineWithProofs(
       VOTING_MACHINE
     ).getProposalVoteConfiguration(proposalId);
     _rootsSubmitted[voteConfig.l1ProposalBlockHash] = false;
+  }
+
+  /// @inheritdoc IVotingChainRobot
+  function setMaxGasPrice(uint256 maxGasPrice) external onlyOwner {
+    _maxGasPrice = maxGasPrice;
+  }
+
+  /// @inheritdoc IVotingChainRobot
+  function getMaxGasPrice() external view returns (uint256) {
+    return _maxGasPrice;
+  }
+
+  /// @inheritdoc IVotingChainRobot
+  function isGasPriceInRange() public view virtual returns (bool) {
+    if (uint256(CHAINLINK_FAST_GAS_ORACLE.latestAnswer()) > _maxGasPrice) {
+      return false;
+    }
+    return true;
+  }
+
+  /// @inheritdoc IVotingChainRobot
+  function isDisabled(uint256 id) public view returns (bool) {
+    return _disabledProposals[id];
   }
 
   /**

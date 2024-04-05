@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
-import {VotingChainRobotKeeper} from '../src/contracts/VotingChainRobotKeeper.sol';
+import {VotingChainRobot} from '../src/contracts/VotingChainRobot.sol';
 import {RootsConsumer, IRootsConsumer} from '../src/contracts/RootsConsumer.sol';
 import {LinkTokenInterface} from 'chainlink/src/v0.8/ChainlinkClient.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
+import {MockAggregator} from 'chainlink/src/v0.8/mocks/MockAggregator.sol';
 import 'aave-governance-v3/tests/voting/votingMachineWithProofs.t.sol';
 
-contract VotingChainRobotKeeperTest is Test {
-  VotingChainRobotKeeper robotKeeper;
+contract VotingChainRobotTest is Test {
+  VotingChainRobot robotKeeper;
   IRootsConsumer rootsConsumer;
 
   IDataWarehouse rootsWarehouse;
@@ -34,9 +35,11 @@ contract VotingChainRobotKeeperTest is Test {
       ''
     );
 
-    robotKeeper = new VotingChainRobotKeeper(
+    MockAggregator chainLinkFastGasFeed = new MockAggregator();
+    robotKeeper = new VotingChainRobot(
       address(votingMachine),
-      address(rootsConsumer)
+      address(rootsConsumer),
+      address(chainLinkFastGasFeed)
     );
     rootsConsumer.setRobotKeeper(address(robotKeeper));
   }
@@ -189,7 +192,7 @@ contract VotingChainRobotKeeperTest is Test {
     assertEq(shouldRunKeeper, false);
   }
 
-  function _checkAndPerformUpKeep(VotingChainRobotKeeper votingChainRobotKeeper) internal {
+  function _checkAndPerformUpKeep(VotingChainRobot votingChainRobotKeeper) internal {
     (bool shouldRunKeeper, bytes memory performData) = votingChainRobotKeeper.checkUpkeep('');
     if (shouldRunKeeper) {
       votingChainRobotKeeper.performUpkeep(performData);

@@ -2,13 +2,14 @@
 pragma solidity ^0.8.0;
 
 import {AutomationCompatibleInterface} from 'chainlink/src/v0.8/interfaces/automation/AutomationCompatibleInterface.sol';
+import {AggregatorInterface} from 'aave-address-book/AaveV3.sol';
 
 /**
- * @title IGovernanceChainRobotKeeper
+ * @title IGovernanceChainRobot
  * @author BGD Labs
  * @notice Defines the interface for the contract to automate actions for the governance.
  **/
-interface IGovernanceChainRobotKeeper is AutomationCompatibleInterface {
+interface IGovernanceChainRobot is AutomationCompatibleInterface {
   /**
    * @notice Emitted when performUpkeep is called and an action is executed.
    * @param id proposal id of successful action.
@@ -46,6 +47,24 @@ interface IGovernanceChainRobotKeeper is AutomationCompatibleInterface {
   function isDisabled(uint256 id) external view returns (bool);
 
   /**
+   * @notice method to check if the current gas prices is lesser than the configured maximum gas prices.
+   * @return bool if the current network gasPrice is in range or not.
+   **/
+  function isGasPriceInRange() external view returns (bool);
+
+  /**
+   * @notice method called by the owner to set the maximum gas price beyond which actions won't be executed.
+   * @param maxGasPrice the maximum gas price in wei of the current network to set.
+   **/
+  function setMaxGasPrice(uint256 maxGasPrice) external;
+
+  /**
+   * @notice method to get the maximum gas price configured beyond which actions won't be executed.
+   * @return maxGasPrice the maximum gas price in wei of the current network.
+   **/
+  function getMaxGasPrice() external returns (uint256);
+
+  /**
    * @notice method called by owner to disable/enabled automation on a specific proposalId.
    * @param proposalId proposalId for which we need to disable/enable automation.
    */
@@ -68,4 +87,10 @@ interface IGovernanceChainRobotKeeper is AutomationCompatibleInterface {
    * @return max number of skips.
    */
   function MAX_SKIP() external returns (uint256);
+
+  /**
+   * @notice method to get the chainlink fast gas oracle contract.
+   * @return chainlink fast gas oracle contract.
+   */
+  function CHAINLINK_FAST_GAS_ORACLE() external view returns (AggregatorInterface);
 }

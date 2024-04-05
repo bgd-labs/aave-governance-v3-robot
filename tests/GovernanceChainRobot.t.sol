@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
-import {GovernanceChainRobotKeeper} from '../src/contracts/GovernanceChainRobotKeeper.sol';
+import {GovernanceChainRobot} from '../src/contracts/GovernanceChainRobot.sol';
+import {MockAggregator} from 'chainlink/src/v0.8/mocks/MockAggregator.sol';
 import 'aave-governance-v3/tests/GovernanceCore.t.sol';
 
-contract GovernanceChainRobotKeeperTest is Test {
+contract GovernanceChainRobotTest is Test {
   address public constant CROSS_CHAIN_CONTROLLER = address(123456);
   address public constant VOTING_STRATEGY = address(123456789);
   address public constant VOTING_PORTAL = address(1230123);
@@ -15,7 +16,7 @@ contract GovernanceChainRobotKeeperTest is Test {
 
   IGovernanceCore public governance;
   TransparentProxyFactory public proxyFactory;
-  GovernanceChainRobotKeeper public robotKeeper;
+  GovernanceChainRobot public robotKeeper;
 
   IGovernanceCore.SetVotingConfigInput public votingConfigLvl1 =
     IGovernanceCore.SetVotingConfigInput({
@@ -78,7 +79,8 @@ contract GovernanceChainRobotKeeperTest is Test {
       )
     );
 
-    robotKeeper = new GovernanceChainRobotKeeper(address(governance));
+    MockAggregator chainLinkFastGasFeed = new MockAggregator();
+    robotKeeper = new GovernanceChainRobot(address(governance), address(chainLinkFastGasFeed));
   }
 
   function testCancel() public {
@@ -296,7 +298,7 @@ contract GovernanceChainRobotKeeperTest is Test {
     assertEq(shouldRunKeeper, false);
   }
 
-  function checkAndPerformUpKeep(GovernanceChainRobotKeeper governanceChainRobotKeeper) private {
+  function checkAndPerformUpKeep(GovernanceChainRobot governanceChainRobotKeeper) private {
     (bool shouldRunKeeper, bytes memory performData) = governanceChainRobotKeeper.checkUpkeep('');
     if (shouldRunKeeper) {
       governanceChainRobotKeeper.performUpkeep(performData);

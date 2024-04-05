@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
-import {ExecutionChainRobotKeeper} from '../src/contracts/ExecutionChainRobotKeeper.sol';
+import {ExecutionChainRobot} from '../src/contracts/ExecutionChainRobot.sol';
+import {MockAggregator} from 'chainlink/src/v0.8/mocks/MockAggregator.sol';
 import 'aave-governance-v3/tests/payloads/PayloadsControllerCore.t.sol';
 
-contract ExecutionChainRobotKeeperTest is Test {
+contract ExecutionChainRobotTest is Test {
   address public constant PAYLOAD_PORTAL = address(987312);
 
-  ExecutionChainRobotKeeper robotKeeper;
+  ExecutionChainRobot robotKeeper;
 
   TransparentProxyFactory proxyFactory;
 
@@ -55,7 +56,8 @@ contract ExecutionChainRobotKeeperTest is Test {
     ownableShort.transferOwnership(payloadsControllerProxy);
     payloadsController = PayloadsControllerMock(payloadsControllerProxy);
 
-    robotKeeper = new ExecutionChainRobotKeeper(address(payloadsController));
+    MockAggregator chainLinkFastGasFeed = new MockAggregator();
+    robotKeeper = new ExecutionChainRobot(address(payloadsController), address(chainLinkFastGasFeed));
   }
 
   function testExecutePayload() public {
@@ -161,7 +163,7 @@ contract ExecutionChainRobotKeeperTest is Test {
     }
   }
 
-  function _checkAndPerformUpKeep(ExecutionChainRobotKeeper executionChainRobotKeeper) internal {
+  function _checkAndPerformUpKeep(ExecutionChainRobot executionChainRobotKeeper) internal {
     (bool shouldRunKeeper, bytes memory performData) = executionChainRobotKeeper.checkUpkeep('');
     if (shouldRunKeeper) {
       executionChainRobotKeeper.performUpkeep(performData);

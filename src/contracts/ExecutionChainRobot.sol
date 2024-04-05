@@ -2,28 +2,33 @@
 pragma solidity ^0.8.0;
 
 import {IPayloadsControllerCore} from 'aave-governance-v3/src/contracts/payloads/interfaces/IPayloadsControllerCore.sol';
-import {IExecutionChainRobotKeeper, AutomationCompatibleInterface} from '../interfaces/IExecutionChainRobotKeeper.sol';
+import {IExecutionChainRobot, AutomationCompatibleInterface} from '../interfaces/IExecutionChainRobot.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {AggregatorInterface} from 'aave-address-book/AaveV3.sol';
 
 /**
- * @title ExecutionChainRobotKeeper
+ * @title ExecutionChainRobot
  * @author BGD Labs
  * @notice Contract to perform automation on payloads controller
  * @dev Aave chainlink automation-keeper-compatible contract to:
  *      - check if the payload could be executed
  *      - executes the payload if all the conditions are met.
  */
-contract ExecutionChainRobotKeeper is Ownable, IExecutionChainRobotKeeper {
-  /// @inheritdoc IExecutionChainRobotKeeper
+contract ExecutionChainRobot is Ownable, IExecutionChainRobot {
+  /// @inheritdoc IExecutionChainRobot
   address public immutable PAYLOADS_CONTROLLER;
 
+  /// @inheritdoc IExecutionChainRobot
+  AggregatorInterface public immutable CHAINLINK_FAST_GAS_ORACLE;
+
+  uint256 internal _maxGasPrice;
   mapping(uint256 => bool) internal _disabledProposals;
 
-  /// @inheritdoc IExecutionChainRobotKeeper
+  /// @inheritdoc IExecutionChainRobot
   uint256 public constant MAX_SHUFFLE_SIZE = 5;
 
   /**
-   * @inheritdoc IExecutionChainRobotKeeper
+   * @inheritdoc IExecutionChainRobot
    * @dev maximum number of payloads to check before the latest payload, if they could be executed.
    *      from the last payload we check 20 more payloads to be very sure that no proposal is being unchecked.
    */
@@ -33,9 +38,11 @@ contract ExecutionChainRobotKeeper is Ownable, IExecutionChainRobotKeeper {
 
   /**
    * @param payloadsController address of the payloads controller contract.
+   * @param chainlinkFastGasOracle address of the chainlink fast gas oracle contract.
    */
-  constructor(address payloadsController) {
+  constructor(address payloadsController, address chainlinkFastGasOracle) {
     PAYLOADS_CONTROLLER = payloadsController;
+    CHAINLINK_FAST_GAS_ORACLE = AggregatorInterface(chainlinkFastGasOracle);
   }
 
   /**
@@ -45,6 +52,8 @@ contract ExecutionChainRobotKeeper is Ownable, IExecutionChainRobotKeeper {
   function checkUpkeep(bytes calldata) external view override returns (bool, bytes memory) {
     uint40[] memory payloadIdsToExecute = new uint40[](MAX_SHUFFLE_SIZE);
     uint256 actionsCount;
+
+    if (!isGasPriceInRange()) return (false, '');
 
     uint40 index = IPayloadsControllerCore(PAYLOADS_CONTROLLER).getPayloadsCount();
     uint256 skipCount;
@@ -103,14 +112,32 @@ contract ExecutionChainRobotKeeper is Ownable, IExecutionChainRobotKeeper {
     if (!isActionPerformed) revert NoActionCanBePerformed();
   }
 
-  /// @inheritdoc IExecutionChainRobotKeeper
-  function isDisabled(uint40 id) public view returns (bool) {
-    return _disabledProposals[id];
-  }
-
-  /// @inheritdoc IExecutionChainRobotKeeper
+  /// @inheritdoc IExecutionChainRobot
   function toggleDisableAutomationById(uint256 id) external onlyOwner {
     _disabledProposals[id] = !_disabledProposals[id];
+  }
+
+    /// @inheritdoc IExecutionChainRobot
+  function setMaxGasPrice(uint256 maxGasPrice) external onlyOwner {
+    _maxGasPrice = maxGasPrice;
+  }
+
+  /// @inheritdoc IExecutionChainRobot
+  function getMaxGasPrice() external view returns (uint256) {
+    return _maxGasPrice;
+  }
+
+  /// @inheritdoc IExecutionChainRobot
+  function isGasPriceInRange() public view virtual returns (bool) {
+    if (uint256(CHAINLINK_FAST_GAS_ORACLE.latestAnswer()) > _maxGasPrice) {
+      return false;
+    }
+    return true;
+  }
+
+  /// @inheritdoc IExecutionChainRobot
+  function isDisabled(uint40 id) public view returns (bool) {
+    return _disabledProposals[id];
   }
 
   /**

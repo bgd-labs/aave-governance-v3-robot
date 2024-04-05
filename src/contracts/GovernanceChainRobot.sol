@@ -2,32 +2,37 @@
 pragma solidity ^0.8.0;
 
 import {IGovernanceCore} from 'aave-governance-v3/src/interfaces/IGovernanceCore.sol';
-import {IGovernanceChainRobotKeeper, AutomationCompatibleInterface} from '../interfaces/IGovernanceChainRobotKeeper.sol';
+import {IGovernanceChainRobot, AutomationCompatibleInterface} from '../interfaces/IGovernanceChainRobot.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {AggregatorInterface} from 'aave-address-book/AaveV3.sol';
 
 /**
- * @title GovernanceChainRobotKeeper
+ * @title GovernanceChainRobot
  * @author BGD Labs
  * @notice Contract to perform automation on governance contract for goveranance v3.
  * @dev Aave chainlink automation-keeper-compatible contract to:
  *      - check if the proposal state could be moved to executed, cancelled or if voting could be activated.
  *      - move the proposal to executed/cancelled or activates voting if all the conditions are met.
  */
-contract GovernanceChainRobotKeeper is Ownable, IGovernanceChainRobotKeeper {
-  mapping(uint256 => bool) internal _disabledProposals;
-
-  /// @inheritdoc IGovernanceChainRobotKeeper
+contract GovernanceChainRobot is Ownable, IGovernanceChainRobot {
+  /// @inheritdoc IGovernanceChainRobot
   address public immutable GOVERNANCE;
 
+  /// @inheritdoc IGovernanceChainRobot
+  AggregatorInterface public immutable CHAINLINK_FAST_GAS_ORACLE;
+
+  uint256 internal _maxGasPrice;
+  mapping(uint256 => bool) internal _disabledProposals;
+
   /**
-   * @inheritdoc IGovernanceChainRobotKeeper
+   * @inheritdoc IGovernanceChainRobot
    * @dev maximum number of actions that can be performed by the keeper in one performUpkeep.
    *      we only perform a max of 5 actions in one performUpkeep as the gas consumption would be quite high otherwise.
    */
   uint256 public constant MAX_ACTIONS = 5;
 
   /**
-   * @inheritdoc IGovernanceChainRobotKeeper
+   * @inheritdoc IGovernanceChainRobot
    * @dev maximum number of proposals to check before the latest proposal if an action could be performed upon.
    *      from the last proposal we check 20 more proposals to be very sure that no proposal is being unchecked.
    */
@@ -37,9 +42,11 @@ contract GovernanceChainRobotKeeper is Ownable, IGovernanceChainRobotKeeper {
 
   /**
    * @param governance address of the governance contract.
+   * @param chainlinkFastGasOracle address of the chainlink fast gas oracle contract.
    */
-  constructor(address governance) {
+  constructor(address governance, address chainlinkFastGasOracle) {
     GOVERNANCE = governance;
+    CHAINLINK_FAST_GAS_ORACLE = AggregatorInterface(chainlinkFastGasOracle);
   }
 
   /**
@@ -48,6 +55,8 @@ contract GovernanceChainRobotKeeper is Ownable, IGovernanceChainRobotKeeper {
    */
   function checkUpkeep(bytes calldata) external view override returns (bool, bytes memory) {
     ActionWithId[] memory actionsWithIds = new ActionWithId[](MAX_ACTIONS);
+
+    if (!isGasPriceInRange()) return (false, '');
 
     uint256 index = IGovernanceCore(GOVERNANCE).getProposalsCount();
     uint256 skipCount = 0;
@@ -138,14 +147,31 @@ contract GovernanceChainRobotKeeper is Ownable, IGovernanceChainRobotKeeper {
     if (!isActionPerformed) revert NoActionCanBePerformed();
   }
 
-  /// @inheritdoc IGovernanceChainRobotKeeper
-  function isDisabled(uint256 id) public view returns (bool) {
-    return _disabledProposals[id];
-  }
-
-  /// @inheritdoc IGovernanceChainRobotKeeper
+  /// @inheritdoc IGovernanceChainRobot
   function toggleDisableAutomationById(uint256 id) external onlyOwner {
     _disabledProposals[id] = !_disabledProposals[id];
+  }
+
+    /// @inheritdoc IGovernanceChainRobot
+  function setMaxGasPrice(uint256 maxGasPrice) external onlyOwner {
+    _maxGasPrice = maxGasPrice;
+  }
+
+  /// @inheritdoc IGovernanceChainRobot
+  function getMaxGasPrice() external view returns (uint256) {
+    return _maxGasPrice;
+  }
+
+  function isGasPriceInRange() public view virtual returns (bool) {
+    if (uint256(CHAINLINK_FAST_GAS_ORACLE.latestAnswer()) > _maxGasPrice) {
+      return false;
+    }
+    return true;
+  }
+
+  /// @inheritdoc IGovernanceChainRobot
+  function isDisabled(uint256 id) public view returns (bool) {
+    return _disabledProposals[id];
   }
 
   /**
