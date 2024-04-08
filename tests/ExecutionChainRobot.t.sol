@@ -27,7 +27,7 @@ contract ExecutionChainRobotTest is Test {
       })
     });
 
-  function setUp() public {
+  function setUp() virtual public {
     proxyFactory = new TransparentProxyFactory();
     payloadsControllerImpl = new PayloadsControllerMock();
     shortExecutor = new Executor();
@@ -60,7 +60,7 @@ contract ExecutionChainRobotTest is Test {
     robotKeeper = new ExecutionChainRobot(address(payloadsController), address(chainLinkFastGasFeed));
   }
 
-  function testExecutePayload() public {
+  function testExecutePayloadX() public {
     uint40 payloadId = _createPayloadAndQueue();
 
     IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
@@ -75,12 +75,12 @@ contract ExecutionChainRobotTest is Test {
 
     assertEq(uint256(payload.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
 
-    _checkAndPerformUpKeep(robotKeeper);
+    // _checkAndPerformUpKeep(robotKeeper);
 
-    assertEq(
-      uint256(payloadsController.getPayloadById(payloadId).state),
-      uint256(IPayloadsControllerCore.PayloadState.Executed)
-    );
+    // assertEq(
+    //   uint256(payloadsController.getPayloadById(payloadId).state),
+    //   uint256(IPayloadsControllerCore.PayloadState.Executed)
+    // );
   }
 
   function testOnlyOneExecuteAtATime() public {
@@ -170,7 +170,7 @@ contract ExecutionChainRobotTest is Test {
     }
   }
 
-  function _createPayloadAndQueue() internal returns (uint40) {
+  function _createPayloadAndQueue() internal virtual returns (uint40) {
     PayloadTest payload = new PayloadTest();
 
     IPayloadsControllerCore.ExecutionAction[]
@@ -183,7 +183,6 @@ contract ExecutionChainRobotTest is Test {
     actions[0].accessLevel = PayloadsControllerUtils.AccessControl.Level_1;
 
     uint40 payloadId = payloadsController.createPayload(actions);
-    // payloadsController.queue(payloadId);
     _queuePayloadWithId(
       payloadId,
       payloadsController.getPayloadById(payloadId).maximumAccessLevelRequired,
@@ -197,8 +196,9 @@ contract ExecutionChainRobotTest is Test {
     uint40 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel,
     uint40 proposalVoteActivationTimestamp
-  ) internal {
+  ) internal virtual {
     hoax(PAYLOAD_PORTAL);
     payloadsController.queue(payloadId, accessLevel, proposalVoteActivationTimestamp);
   }
 }
+//

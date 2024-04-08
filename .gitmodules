@@ -15,3 +15,7 @@
 [submodule "lib/aave-governance-v3"]
 	path = lib/aave-governance-v3
 	url = https://github.com/bgd-labs/aave-governance-v3
+[submodule "lib/aave-helpers"]
+	path = lib/aave-helpers
+	url = https://github.com/bgd-labs/aave-helpers
+  branch = master
