@@ -6,9 +6,15 @@ import {AggregatorInterface} from 'aave-address-book/AaveV3.sol';
 /**
  * @title IGasPriceCappedRobot
  * @author BGD Labs
- * @notice Defines the interface for the contract to automate actions for the payloads controller on execution chain.
+ * @notice Defines the interface for the gas price capped robot.
  **/
 interface IGasPriceCappedRobot {
+  /**
+   * @notice Emitted when maxGasPrice has been set by the owner.
+   * @param maxGasPrice new maximum gas price of the network set by the owner.
+   */
+  event MaxGasPriceSet(uint256 indexed maxGasPrice);
+
   /**
    * @notice method to check if the current gas prices is lesser than the configured maximum gas prices.
    * @return bool if the current network gasPrice is in range or not.

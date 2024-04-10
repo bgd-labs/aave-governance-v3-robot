@@ -160,11 +160,14 @@ contract ExecutionChainRobotKeeperTest is Test {
     }
   }
 
-  function _checkAndPerformUpKeep(ExecutionChainRobotKeeper executionChainRobotKeeper) internal {
+  function _checkAndPerformUpKeep(
+    ExecutionChainRobotKeeper executionChainRobotKeeper
+  ) internal returns (bool) {
     (bool shouldRunKeeper, bytes memory performData) = executionChainRobotKeeper.checkUpkeep('');
     if (shouldRunKeeper) {
       executionChainRobotKeeper.performUpkeep(performData);
     }
+    return shouldRunKeeper;
   }
 
   function _createPayloadAndQueue() internal virtual returns (uint40) {

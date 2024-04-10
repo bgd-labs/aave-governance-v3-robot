@@ -1,26 +1,28 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
-import {ExecutionChainRobotKeeper} from '../ExecutionChainRobotKeeper.sol';
+import {VotingChainRobotKeeper} from '../VotingChainRobotKeeper.sol';
 import {AutomationCompatibleInterface} from 'chainlink/src/v0.8/interfaces/automation/AutomationCompatibleInterface.sol';
 import {GasCappedRobotBase} from './GasCappedRobotBase.sol';
 
 /**
- * @title GasCappedExecutionChainRobotKeeper
+ * @title GasCappedVotingChainRobotKeeper
  * @author BGD Labs
- * @notice Contract to perform automation on payloads controller.
- *         The difference from ExecutionChainRobotKeeper is that automation is only
+ * @notice Contract to perform automation on voting machine and data warehouse contract for goveranance v3.
+ *         The difference from VotingChainRobotKeeper is that automation is only
  *         performed when the network gas price in within the maximum configured range.
  */
-contract GasCappedExecutionChainRobotKeeper is GasCappedRobotBase, ExecutionChainRobotKeeper {
+contract GasCappedVotingChainRobotKeeper is GasCappedRobotBase, VotingChainRobotKeeper {
   /**
-   * @param payloadsController address of the payloads controller contract.
+   * @param votingMachine address of the voting machine contract.
+   * @param rootsConsumer address of the roots consumer contract to registers the roots.
    * @param gasPriceOracle address of the gas price oracle contract.
    */
   constructor(
-    address payloadsController,
+    address votingMachine,
+    address rootsConsumer,
     address gasPriceOracle
-  ) ExecutionChainRobotKeeper(payloadsController) GasCappedRobotBase(gasPriceOracle) {}
+  ) VotingChainRobotKeeper(votingMachine, rootsConsumer) GasCappedRobotBase(gasPriceOracle) {}
 
   /**
    * @inheritdoc AutomationCompatibleInterface

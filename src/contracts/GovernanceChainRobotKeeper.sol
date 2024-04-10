@@ -46,7 +46,7 @@ contract GovernanceChainRobotKeeper is Ownable, IGovernanceChainRobotKeeper {
    * @inheritdoc AutomationCompatibleInterface
    * @dev run off-chain, checks if proposals should be moved to executed, cancelled state or if voting could be activated
    */
-  function checkUpkeep(bytes calldata) external view override returns (bool, bytes memory) {
+  function checkUpkeep(bytes memory) public view virtual override returns (bool, bytes memory) {
     ActionWithId[] memory actionsWithIds = new ActionWithId[](MAX_ACTIONS);
 
     uint256 index = IGovernanceCore(GOVERNANCE).getProposalsCount();
