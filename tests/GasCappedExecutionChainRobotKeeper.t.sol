@@ -15,7 +15,7 @@ contract GasCappedExecutionChainRobotKeeperTest is ExecutionChainRobotKeeperTest
 
   event MaxGasPriceSet(uint256 indexed maxGasPrice);
 
-  function setUp() public override {
+  function setUp() virtual public override {
     vm.createSelectFork('mainnet', 19609260); // Apr-8-2024
 
     proxyFactory = TransparentProxyFactory(MiscEthereum.TRANSPARENT_PROXY_FACTORY);
@@ -63,7 +63,7 @@ contract GasCappedExecutionChainRobotKeeperTest is ExecutionChainRobotKeeperTest
     vm.stopPrank();
   }
 
-  function test_isGasPriceInRange() public {
+  function test_isGasPriceInRange() virtual public {
     assertEq(GasCappedExecutionChainRobotKeeper(address(robotKeeper)).isGasPriceInRange(), true);
 
     vm.startPrank(GUARDIAN);
@@ -75,7 +75,7 @@ contract GasCappedExecutionChainRobotKeeperTest is ExecutionChainRobotKeeperTest
     assertEq(GasCappedExecutionChainRobotKeeper(address(robotKeeper)).isGasPriceInRange(), false);
   }
 
-  function test_robotExecutionOnlyWhenGasPriceInRange() public {
+  function test_robotExecutionOnlyWhenGasPriceInRange() virtual public {
     vm.startPrank(GUARDIAN);
     GasCappedExecutionChainRobotKeeper(address(robotKeeper)).setMaxGasPrice(
       uint256(chainLinkFastGasFeed.latestAnswer()) - 1
