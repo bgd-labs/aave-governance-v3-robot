@@ -19,6 +19,7 @@ contract AaveCLRobotOperatorTest is Test {
   address constant WITHDRAW_ADDRESS = address(2);
   address constant REGISTRY = 0x696fB0d7D069cc0bb35a7c36115CE63E55cb9AA6;
   address constant REGISTRAR = 0xe601C5837307f07aB39DEB0f5516602f045BF14f;
+  address constant GUARDIAN = 0x9867Ce43D2a574a152fE6b134F64c9578ce3cE03;
 
   address constant OLD_REGISTRY = 0x75c0530885F385721fddA23C539AF3701d6183D4;
   address constant OLD_REGISTRAR = 0x4F3AF332A30973106Fe146Af0B4220bBBeA748eC;
@@ -42,7 +43,8 @@ contract AaveCLRobotOperatorTest is Test {
         REGISTRY,
         REGISTRAR,
         WITHDRAW_ADDRESS,
-        GovernanceV3Optimism.EXECUTOR_LVL_1
+        GovernanceV3Optimism.EXECUTOR_LVL_1,
+        GUARDIAN // guardian
       )
     );
   }
