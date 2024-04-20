@@ -37,14 +37,16 @@ contract AaveCLRobotOperator is OwnableWithGuardian, Initializable, IAaveCLRobot
     address keeperRegistry,
     address keeperRegistrar,
     address linkWithdrawAddress,
-    address operatorOwner
+    address operatorOwner,
+    address operatorGuardian
   ) external initializer {
     _keeperRegistry = keeperRegistry;
     _keeperRegistrar = keeperRegistrar;
     _linkWithdrawAddress = linkWithdrawAddress;
-    _transferOwnership(operatorOwner);
     _linkToken = IKeeperRegistry(_keeperRegistry).getLinkAddress();
-    emit Initialized(keeperRegistry, keeperRegistrar, linkWithdrawAddress, operatorOwner);
+    _transferOwnership(operatorOwner);
+    _updateGuardian(operatorGuardian);
+    emit Initialized(keeperRegistry, keeperRegistrar, linkWithdrawAddress, operatorOwner, operatorGuardian);
   }
 
   /// @notice In order to fund the keeper we need to approve the Link token amount to this contract

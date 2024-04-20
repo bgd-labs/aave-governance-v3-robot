@@ -13,12 +13,14 @@ interface IInitializableRobotOperator {
    * @param keeperRegistrar address of the chainlink registrar.
    * @param linkWithdrawAddress withdrawal address of the operator contract.
    * @param operatorOwner owner of the operator contract.
+   * @param operatorGuardian guardian of the operator contract.
    **/
   event Initialized(
     address keeperRegistry,
     address keeperRegistrar,
     address linkWithdrawAddress,
-    address operatorOwner
+    address operatorOwner,
+    address operatorGuardian
   );
 
   /**
@@ -27,11 +29,13 @@ interface IInitializableRobotOperator {
    * @param keeperRegistrar address of the chainlink registrar.
    * @param linkWithdrawAddress withdrawal address to send the exccess link after cancelling the keeper.
    * @param operatorOwner address to set as the owner of the operator contract.
+   * @param operatorGuardian address to set as the guardian of the operator contract.
    */
   function initialize(
     address keeperRegistry,
     address keeperRegistrar,
     address linkWithdrawAddress,
-    address operatorOwner
+    address operatorOwner,
+    address operatorGuardian
   ) external;
 }
