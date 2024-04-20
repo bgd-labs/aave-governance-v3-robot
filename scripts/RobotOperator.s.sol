@@ -38,7 +38,7 @@ library DeployRobotOperator {
   }
 }
 
-contract DeployEthereum is Script {
+contract DeployMainnet is Script {
   function run() external {
     vm.startBroadcast();
     address robotOperator = DeployRobotOperator._deploy(
