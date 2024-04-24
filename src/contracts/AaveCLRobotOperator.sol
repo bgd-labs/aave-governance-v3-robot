@@ -52,12 +52,13 @@ contract AaveCLRobotOperator is OwnableWithGuardian, Initializable, IAaveCLRobot
   /// @notice In order to fund the keeper we need to approve the Link token amount to this contract
   /// @inheritdoc IAaveCLRobotOperator
   function register(
-    string memory name,
+    string calldata name,
     address upkeepContract,
+    bytes calldata upkeepCheckData,
     uint32 gasLimit,
     uint96 amountToFund,
     uint8 triggerType,
-    bytes memory triggerConfig
+    bytes calldata triggerConfig
   ) external onlyOwner returns (uint256) {
     IERC20(_linkToken).safeTransferFrom(msg.sender, address(this), amountToFund);
 
@@ -68,7 +69,7 @@ contract AaveCLRobotOperator is OwnableWithGuardian, Initializable, IAaveCLRobot
       gasLimit: gasLimit, // max gasLimit which can be used for an performUpkeep action
       adminAddress: address(this), // admin of the keeper is set to this address of AaveCLRobotOperator
       triggerType: triggerType, // 0 for conditional type keeper, 1 for log type
-      checkData: '', // checkData of the keeper which get passed to the checkUpkeep, unused
+      checkData: upkeepCheckData, // checkData of the keeper which get passed to the checkUpkeep
       triggerConfig: triggerConfig, // configuration for log type keeper, else unused
       offchainConfig: '', // unused
       amount: amountToFund // amount of link to fund the keeper with

@@ -59,7 +59,7 @@ contract AaveCLRobotOperatorTest is Test {
     assertEq(registeredKeepers[0], id);
     assertEq(upkeepInfo.target, upkeep);
     assertEq(upkeepInfo.performGas, 1000000);
-    assertEq(upkeepInfo.checkData, '');
+    assertEq(upkeepInfo.checkData, abi.encode(address(1)));
     assertEq(upkeepInfo.balance, 100 ether);
     assertEq(upkeepInfo.admin, address(aaveCLRobotOperator));
     assertTrue(upkeepInfo.maxValidBlocknumber > block.number);
@@ -81,6 +81,7 @@ contract AaveCLRobotOperatorTest is Test {
     uint256 id = aaveCLRobotOperator.register(
       'testName',
       address(ethRobotKeeper),
+      '',
       1_000_000,
       100 ether,
       1, // should be 1 for event type keeper 0 otherwise
@@ -236,6 +237,7 @@ contract AaveCLRobotOperatorTest is Test {
     uint256 id = aaveCLRobotOperator.register(
       'testName',
       address(ethRobotKeeper),
+      abi.encode(address(1)),
       1_000_000,
       100 ether,
       0,
