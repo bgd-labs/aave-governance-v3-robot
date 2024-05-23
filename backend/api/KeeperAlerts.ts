@@ -73,14 +73,7 @@ const config = {
     registry: '0x02777053d6764996e594c3E88AF1D58D5363a2e6',
     registryVersion: 1,
     network: 'avalanche'
-  },
-  baseExecutionChainKeeper: {
-    name: 'Execution Chain Keeper',
-    id: '110844910122831225835763727857179632339856792606450773885855748860468415334038',
-    registry: '0xE226D5aCae908252CcA3F6CEFa577527650a9e1e',
-    registryVersion: 2,
-    network: 'base'
-  },
+  }
 };
 
 export default async function handler(request: VercelRequest, response: VercelResponse) {
