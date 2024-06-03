@@ -11,69 +11,6 @@ const client = new WebClient(process.env.SLACK_TOKEN, {
 const channelId = process.env.CHANNEL_ID;
 
 const config = {
-  mainnetExecutionChainKeeper: {
-    name: 'Execution Chain Keeper',
-    id: '103962992988872542945147446194468190544109628047207929929141163121857186570465',
-    registry: '0x02777053d6764996e594c3E88AF1D58D5363a2e6',
-    registryVersion: 1,
-    network: 'mainnet'
-  },
-  mainnetGovernanceChainKeeper: {
-    name: 'Governance Chain Keeper',
-    id: '2651260633509968244842245718659958660539758109819220392919944208741153930322',
-    registry: '0x02777053d6764996e594c3E88AF1D58D5363a2e6',
-    registryVersion: 1,
-    network: 'mainnet'
-  },
-  mainnetVotingChainKeeper: {
-    name: 'Voting Chain Keeper',
-    id: '37197956100690146667709888676659477205673841758151251597253206670225866349198',
-    registry: '0x02777053d6764996e594c3E88AF1D58D5363a2e6',
-    registryVersion: 1,
-    network: 'mainnet'
-  },
-  polygonExecutionChainKeeper: {
-    name: 'Execution Chain Keeper',
-    id: '82990232394810788826748981965753730350133859818029683929136401112559915179430',
-    registry: '0x02777053d6764996e594c3E88AF1D58D5363a2e6',
-    registryVersion: 1,
-    network: 'polygon'
-  },
-  polygonVotingChainKeeper: {
-    name: 'Voting Chain Keeper',
-    id: '5475326125853957331243818268970211605617607736278808003229011576358255850220',
-    registry: '0x02777053d6764996e594c3E88AF1D58D5363a2e6',
-    registryVersion: 1,
-    network: 'polygon'
-  },
-  arbitrumExecutionChainKeeper: {
-    name: 'Execution Chain Keeper',
-    id: '78329451080216164099529400539433108989111820950862041749656351555695961643082',
-    registry: '0x75c0530885F385721fddA23C539AF3701d6183D4',
-    registryVersion: 1,
-    network: 'arbitrum'
-  },
-  optimismExecutionChainKeeper: {
-    name: 'Execution Chain Keeper',
-    id: '98991846084053478582099013231511635776224064505474556907242977329597039975307',
-    registry: '0x75c0530885F385721fddA23C539AF3701d6183D4',
-    registryVersion: 1,
-    network: 'optimism'
-  },
-  avalancheExecutionChainKeeper: {
-    name: 'Execution Chain Keeper',
-    id: '42967470609923359998605990815360926273002411113492386351801017384824248835129',
-    registry: '0x02777053d6764996e594c3E88AF1D58D5363a2e6',
-    registryVersion: 1,
-    network: 'avalanche'
-  },
-  avalancheVotingChainKeeper: {
-    name: 'Voting Chain Keeper',
-    id: '23105234861606727783784560473737793446534476931507704105643023042466416318991',
-    registry: '0x02777053d6764996e594c3E88AF1D58D5363a2e6',
-    registryVersion: 1,
-    network: 'avalanche'
-  }
 };
 
 export default async function handler(request: VercelRequest, response: VercelResponse) {
