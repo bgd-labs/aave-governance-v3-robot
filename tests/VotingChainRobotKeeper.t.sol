@@ -15,11 +15,20 @@ contract VotingChainRobotKeeperTest is Test {
   IVotingStrategy votingStrategy;
   IVotingMachineWithProofs votingMachine;
 
-  bytes32 constant BLOCK_HASH = 0x17fb51754007ba63313584d93eaf01a6c7b50fb6975c46c600489ed78dc5e8ff;
-  address constant LINK_TOKEN = address(7979);
+  bytes32 public constant BLOCK_HASH = 0x17fb51754007ba63313584d93eaf01a6c7b50fb6975c46c600489ed78dc5e8ff;
+  address public constant GUARDIAN = address(1);
+  address public constant LINK_TOKEN = address(7979);
   address public constant GOVERNANCE = address(GovernanceV3Ethereum.GOVERNANCE);
 
-  function setUp() public {
+  event ActionSucceeded(uint256 indexed id, ProposalAction indexed action);
+
+  enum ProposalAction {
+    PerformSubmitRoots,
+    PerformCreateVote,
+    PerformCloseAndSendVote
+  }
+
+  function setUp() public virtual {
     rootsWarehouse = new DataWarehouse();
     votingStrategy = new VotingStrategy(address(rootsWarehouse));
     votingMachine = new VotingMachine(votingStrategy, GOVERNANCE);
@@ -33,42 +42,24 @@ contract VotingChainRobotKeeperTest is Test {
       address(123),
       ''
     );
+    vm.prank(GUARDIAN);
+    robotKeeper = new VotingChainRobotKeeper(address(votingMachine), address(rootsConsumer));
 
-    robotKeeper = new VotingChainRobotKeeper(
-      address(votingMachine),
-      address(rootsConsumer)
-    );
     rootsConsumer.setRobotKeeper(address(robotKeeper));
   }
 
   function testCreateVote() public {
     uint256 proposalId = 10;
-    uint256[] memory proposalIds = new uint256[](1);
-    proposalIds[0] = proposalId;
-
     uint24 votingDuration = uint24(62341);
-    VotingMachine(address(votingMachine)).setProposalsVoteConfiguration(
-      proposalId,
-      BLOCK_HASH,
-      votingDuration
-    );
-    VotingMachine(address(votingMachine)).setProposalsVoteConfigurationIds(proposalIds);
-
-    vm.mockCall(
-      address(votingStrategy),
-      abi.encodeWithSelector(IVotingStrategy.hasRequiredRoots.selector, BLOCK_HASH),
-      abi.encode('test')
-    );
-    vm.mockCall(
-      address(rootsWarehouse),
-      abi.encodeWithSelector(IDataWarehouse.getStorageRoots.selector, GOVERNANCE, BLOCK_HASH),
-      abi.encode(keccak256(abi.encode('test')))
-    );
+    _readyProposalForCreateVote(proposalId, votingDuration, BLOCK_HASH);
 
     assertEq(
       uint256(votingMachine.getProposalState(proposalId)),
       uint256(IVotingMachineWithProofs.ProposalState.NotCreated)
     );
+
+    vm.expectEmit();
+    emit ActionSucceeded(proposalId, ProposalAction.PerformCreateVote);
 
     _checkAndPerformUpKeep(robotKeeper);
 
@@ -76,20 +67,22 @@ contract VotingChainRobotKeeperTest is Test {
       uint256(votingMachine.getProposalState(proposalId)),
       uint256(IVotingMachineWithProofs.ProposalState.Active)
     );
-    vm.clearMockedCalls();
   }
 
   function testCloseAndSendVote() public {
     uint256 proposalId = 5;
     uint24 votingDuration = 600;
 
-    _createVote(proposalId, votingDuration);
+    _createVote(proposalId, votingDuration, BLOCK_HASH);
     skip(votingDuration + 1);
 
     assertEq(
       uint8(votingMachine.getProposalState(proposalId)),
       uint8(IVotingMachineWithProofs.ProposalState.Finished)
     );
+
+    vm.expectEmit();
+    emit ActionSucceeded(proposalId, ProposalAction.PerformCloseAndSendVote);
 
     _checkAndPerformUpKeep(robotKeeper);
 
@@ -101,66 +94,38 @@ contract VotingChainRobotKeeperTest is Test {
 
   function testSubmitRoots() public {
     uint256 proposalId = 20;
-    uint256[] memory proposalIds = new uint256[](1);
-    proposalIds[0] = proposalId;
-    VotingMachine(address(votingMachine)).setProposalsVoteConfiguration(
-      proposalId,
-      BLOCK_HASH,
-      600
-    );
-    VotingMachine(address(votingMachine)).setProposalsVoteConfigurationIds(proposalIds);
+    _readyProposalForRootsSubmit(20, BLOCK_HASH);
 
-    vm.mockCall(
-      LINK_TOKEN,
-      abi.encodeWithSelector(LinkTokenInterface.transferAndCall.selector),
-      abi.encode(true)
-    );
+    vm.expectEmit();
+    emit ActionSucceeded(proposalId, ProposalAction.PerformSubmitRoots);
+
     _checkAndPerformUpKeep(robotKeeper);
   }
 
   function testMultipleActions() public {
     // Proposal for which roots can be submitted
     uint256 proposalId1 = 20;
-    uint256[] memory proposalIds = new uint256[](2);
-    proposalIds[0] = proposalId1;
-    VotingMachine(address(votingMachine)).setProposalsVoteConfiguration(
-      proposalId1,
-      BLOCK_HASH,
-      600
-    );
-    vm.mockCall(
-      LINK_TOKEN,
-      abi.encodeWithSelector(LinkTokenInterface.transferAndCall.selector),
-      abi.encode(true)
-    );
+    bytes32 blockHash = 0x12fb44224007ba63313584d93eaf01a6c7b50fb6975c22c500489ed78dc4e800;
+    _readyProposalForRootsSubmit(proposalId1, blockHash);
 
     // Proposal for which createVote action could be performed
     uint256 proposalId2 = 10;
-    proposalIds[0] = proposalId2;
+    _readyProposalForCreateVote(proposalId2, 500, BLOCK_HASH);
 
-    uint24 votingDurationCreateVote = uint24(62341);
-    VotingMachine(address(votingMachine)).setProposalsVoteConfiguration(
-      proposalId2,
-      BLOCK_HASH,
-      votingDurationCreateVote
+    assertEq(
+      uint256(votingMachine.getProposalState(proposalId1)),
+      uint256(IVotingMachineWithProofs.ProposalState.NotCreated)
     );
-    vm.mockCall(
-      address(votingStrategy),
-      abi.encodeWithSelector(IVotingStrategy.hasRequiredRoots.selector, BLOCK_HASH),
-      abi.encode()
-    );
-    vm.mockCall(
-      address(rootsWarehouse),
-      abi.encodeWithSelector(IDataWarehouse.getStorageRoots.selector, GOVERNANCE, BLOCK_HASH),
-      abi.encode(keccak256(abi.encode('test')))
-    );
-
-    VotingMachine(address(votingMachine)).setProposalsVoteConfigurationIds(proposalIds);
-
     assertEq(
       uint256(votingMachine.getProposalState(proposalId2)),
       uint256(IVotingMachineWithProofs.ProposalState.NotCreated)
     );
+
+    vm.expectEmit();
+    emit ActionSucceeded(proposalId1, ProposalAction.PerformSubmitRoots);
+
+    vm.expectEmit();
+    emit ActionSucceeded(proposalId2, ProposalAction.PerformCreateVote);
 
     _checkAndPerformUpKeep(robotKeeper);
 
@@ -175,7 +140,7 @@ contract VotingChainRobotKeeperTest is Test {
     uint256 proposalId = 5;
     uint24 votingDuration = 600;
 
-    _createVote(proposalId, votingDuration);
+    _createVote(proposalId, votingDuration, BLOCK_HASH);
     skip(votingDuration + 1);
 
     assertEq(
@@ -183,40 +148,75 @@ contract VotingChainRobotKeeperTest is Test {
       uint8(IVotingMachineWithProofs.ProposalState.Finished)
     );
 
+    vm.prank(GUARDIAN);
     robotKeeper.toggleDisableAutomationById(5);
 
     (bool shouldRunKeeper, ) = robotKeeper.checkUpkeep('');
     assertEq(shouldRunKeeper, false);
+
+    vm.prank(GUARDIAN);
+    robotKeeper.toggleDisableAutomationById(5);
+
+    (shouldRunKeeper, ) = robotKeeper.checkUpkeep('');
+    assertEq(shouldRunKeeper, true);
   }
 
-  function _checkAndPerformUpKeep(VotingChainRobotKeeper votingChainRobotKeeper) internal {
+  function _checkAndPerformUpKeep(VotingChainRobotKeeper votingChainRobotKeeper) internal returns (bool) {
     (bool shouldRunKeeper, bytes memory performData) = votingChainRobotKeeper.checkUpkeep('');
     if (shouldRunKeeper) {
       votingChainRobotKeeper.performUpkeep(performData);
     }
+    return shouldRunKeeper;
   }
 
-  function _createVote(uint256 proposalId, uint24 votingDuration) internal {
+  function _createVote(uint256 proposalId, uint24 votingDuration, bytes32 blockHash) internal virtual {
+    _readyProposalForCreateVote(proposalId, votingDuration, blockHash);
+
+    votingMachine.startProposalVote(proposalId);
+    vm.clearMockedCalls();
+  }
+
+  function _readyProposalForRootsSubmit(uint256 proposalId, bytes32 blockHash) internal virtual {
     uint256[] memory proposalIds = new uint256[](1);
     proposalIds[0] = proposalId;
+
     VotingMachine(address(votingMachine)).setProposalsVoteConfiguration(
       proposalId,
-      BLOCK_HASH,
+      blockHash,
+      600
+    );
+    VotingMachine(address(votingMachine)).setProposalsVoteConfigurationIds(proposalIds);
+    vm.mockCall(
+      LINK_TOKEN,
+      abi.encodeWithSelector(LinkTokenInterface.transferAndCall.selector),
+      abi.encode(true)
+    );
+  }
+
+  function _readyProposalForCreateVote(uint256 proposalId, uint24 votingDuration, bytes32 blockHash) internal virtual {
+    uint256[] memory oldProposalIds = VotingMachine(address(votingMachine)).getProposalsVoteConfigurationIds(0, 100);
+    uint256[] memory proposalIds = new uint256[](oldProposalIds.length + 1);
+
+    for (uint i = 0; i < oldProposalIds.length; i++) proposalIds[i] = oldProposalIds[i];
+    proposalIds[oldProposalIds.length] = proposalId;
+
+    VotingMachine(address(votingMachine)).setProposalsVoteConfiguration(
+      proposalId,
+      blockHash,
       votingDuration
     );
+
     VotingMachine(address(votingMachine)).setProposalsVoteConfigurationIds(proposalIds);
 
     vm.mockCall(
       address(votingStrategy),
-      abi.encodeWithSelector(IVotingStrategy.hasRequiredRoots.selector, BLOCK_HASH),
+      abi.encodeWithSelector(IVotingStrategy.hasRequiredRoots.selector, blockHash),
       abi.encode()
     );
     vm.mockCall(
       address(rootsWarehouse),
-      abi.encodeWithSelector(IDataWarehouse.getStorageRoots.selector, GOVERNANCE, BLOCK_HASH),
+      abi.encodeWithSelector(IDataWarehouse.getStorageRoots.selector, GOVERNANCE, blockHash),
       abi.encode(keccak256(abi.encode('test')))
     );
-    votingMachine.startProposalVote(proposalId);
-    vm.clearMockedCalls();
   }
 }

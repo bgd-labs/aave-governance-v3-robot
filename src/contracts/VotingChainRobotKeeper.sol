@@ -54,10 +54,7 @@ contract VotingChainRobotKeeper is Ownable, IVotingChainRobotKeeper {
    * @param votingMachine address of the voting machine contract.
    * @param rootsConsumer address of the roots consumer contract to registers the roots.
    */
-  constructor(
-    address votingMachine,
-    address rootsConsumer
-  ) {
+  constructor(address votingMachine, address rootsConsumer) {
     VOTING_MACHINE = votingMachine;
     ROOTS_CONSUMER = rootsConsumer;
     VOTING_STRATEGY = address(IVotingMachineWithProofs(VOTING_MACHINE).VOTING_STRATEGY());
@@ -69,7 +66,7 @@ contract VotingChainRobotKeeper is Ownable, IVotingChainRobotKeeper {
    * @dev run off-chain, checks if payload should be executed, createVote closeAndSendVote needs
    *      to be called or if roots needs to be submitted.
    */
-  function checkUpkeep(bytes calldata) external view override returns (bool, bytes memory) {
+  function checkUpkeep(bytes memory) public view virtual override returns (bool, bytes memory) {
     ActionWithId[] memory actionsWithIds = new ActionWithId[](MAX_ACTIONS);
 
     bool canVotingActionBePerformed;

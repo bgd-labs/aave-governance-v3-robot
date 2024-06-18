@@ -5,13 +5,14 @@ import {GovernanceChainRobotKeeper} from '../src/contracts/GovernanceChainRobotK
 import 'aave-governance-v3/tests/GovernanceCore.t.sol';
 
 contract GovernanceChainRobotKeeperTest is Test {
-  address public constant CROSS_CHAIN_CONTROLLER = address(123456);
-  address public constant VOTING_STRATEGY = address(123456789);
-  address public constant VOTING_PORTAL = address(1230123);
-  uint256 public constant EXECUTION_GAS_LIMIT = 400000;
-  uint256 public constant COOLDOWN_PERIOD = 1 days;
-  uint256 public constant CANCELLATION_FEE = 0.05 ether;
-  address public constant CANCELLATION_FEE_COLLECTOR = address(123404321);
+  address public CROSS_CHAIN_CONTROLLER = address(123456);
+  address public POWER_STRATEGY = address(123456789);
+  address public VOTING_PORTAL = address(1230123);
+  uint256 public EXECUTION_GAS_LIMIT = 400000;
+  uint256 public COOLDOWN_PERIOD = 1 days;
+  uint256 public CANCELLATION_FEE = 0.05 ether;
+  address public CANCELLATION_FEE_COLLECTOR = address(123404321);
+  address public constant GUARDIAN = address(1);
 
   IGovernanceCore public governance;
   TransparentProxyFactory public proxyFactory;
@@ -37,7 +38,7 @@ contract GovernanceChainRobotKeeperTest is Test {
       minPropositionPower: votingConfigLvl1.minPropositionPower + 50_000 ether
     });
 
-  function setUp() public {
+  function setUp() public virtual {
     IGovernanceCore.SetVotingConfigInput[]
       memory votingConfigsInput = new IGovernanceCore.SetVotingConfigInput[](2);
     votingConfigsInput[0] = votingConfigLvl1;
@@ -56,7 +57,7 @@ contract GovernanceChainRobotKeeperTest is Test {
     address[] memory powerTokens = new address[](1);
     powerTokens[0] = address(1239746519);
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(IBaseVotingStrategy.getVotingAssetList.selector),
       abi.encode(powerTokens)
     );
@@ -68,7 +69,7 @@ contract GovernanceChainRobotKeeperTest is Test {
           IGovernance.initialize.selector,
           address(123),
           address(1234), // guardian
-          VOTING_STRATEGY,
+          POWER_STRATEGY,
           votingConfigsInput,
           votingPortals,
           EXECUTION_GAS_LIMIT,
@@ -78,6 +79,7 @@ contract GovernanceChainRobotKeeperTest is Test {
       )
     );
 
+    vm.prank(GUARDIAN);
     robotKeeper = new GovernanceChainRobotKeeper(address(governance));
   }
 
@@ -87,7 +89,7 @@ contract GovernanceChainRobotKeeperTest is Test {
     IGovernanceCore.Proposal memory proposal = governance.getProposal(proposalId);
 
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(
         IGovernancePowerStrategy.getFullPropositionPower.selector,
         address(this)
@@ -120,7 +122,7 @@ contract GovernanceChainRobotKeeperTest is Test {
 
     skip(config.coolDownBeforeVotingStart + 1);
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(
         IGovernancePowerStrategy.getFullPropositionPower.selector,
         address(this)
@@ -171,7 +173,7 @@ contract GovernanceChainRobotKeeperTest is Test {
       abi.encode(bytes32(0), bytes32(0))
     );
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(
         IGovernancePowerStrategy.getFullPropositionPower.selector,
         address(this)
@@ -204,7 +206,7 @@ contract GovernanceChainRobotKeeperTest is Test {
 
     skip(config.coolDownBeforeVotingStart + 1);
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(
         IGovernancePowerStrategy.getFullPropositionPower.selector,
         address(this)
@@ -243,7 +245,7 @@ contract GovernanceChainRobotKeeperTest is Test {
     );
 
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(
         IGovernancePowerStrategy.getFullPropositionPower.selector,
         address(this)
@@ -278,7 +280,7 @@ contract GovernanceChainRobotKeeperTest is Test {
     _activateVote(proposalId);
 
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(
         IGovernancePowerStrategy.getFullPropositionPower.selector,
         address(this)
@@ -290,13 +292,14 @@ contract GovernanceChainRobotKeeperTest is Test {
       uint256(IGovernanceCore.State.Active)
     );
 
+    vm.prank(GUARDIAN);
     robotKeeper.toggleDisableAutomationById(proposalId);
 
     (bool shouldRunKeeper, ) = robotKeeper.checkUpkeep('');
     assertEq(shouldRunKeeper, false);
   }
 
-  function checkAndPerformUpKeep(GovernanceChainRobotKeeper governanceChainRobotKeeper) private {
+  function checkAndPerformUpKeep(GovernanceChainRobotKeeper governanceChainRobotKeeper) internal {
     (bool shouldRunKeeper, bytes memory performData) = governanceChainRobotKeeper.checkUpkeep('');
     if (shouldRunKeeper) {
       governanceChainRobotKeeper.performUpkeep(performData);
@@ -315,7 +318,7 @@ contract GovernanceChainRobotKeeperTest is Test {
     bytes32 blockHash = blockhash(block.number - 1);
 
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(
         IGovernancePowerStrategy.getFullPropositionPower.selector,
         address(this)
@@ -363,7 +366,7 @@ contract GovernanceChainRobotKeeperTest is Test {
     skip(config.coolDownBeforeVotingStart + 1);
 
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(
         IGovernancePowerStrategy.getFullPropositionPower.selector,
         address(this)
@@ -379,10 +382,10 @@ contract GovernanceChainRobotKeeperTest is Test {
     uint128 forVotes = 1000000 ether;
     uint128 againstVotes = 1 ether;
 
-    skip(proposal.votingDuration + proposal.votingActivationTime + 1);
+    skip(proposal.votingDuration + 1);
 
     vm.mockCall(
-      VOTING_STRATEGY,
+      POWER_STRATEGY,
       abi.encodeWithSelector(
         IGovernancePowerStrategy.getFullPropositionPower.selector,
         address(this)

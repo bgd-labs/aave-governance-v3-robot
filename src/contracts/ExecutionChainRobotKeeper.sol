@@ -42,7 +42,7 @@ contract ExecutionChainRobotKeeper is Ownable, IExecutionChainRobotKeeper {
    * @inheritdoc AutomationCompatibleInterface
    * @dev run off-chain, checks if payload should be executed
    */
-  function checkUpkeep(bytes calldata) external view override returns (bool, bytes memory) {
+  function checkUpkeep(bytes memory) public view virtual override returns (bool, bytes memory) {
     uint40[] memory payloadIdsToExecute = new uint40[](MAX_SHUFFLE_SIZE);
     uint256 actionsCount;
 

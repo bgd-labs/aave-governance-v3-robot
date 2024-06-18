@@ -26,7 +26,7 @@ contract ExecutionChainRobotKeeperTest is Test {
       })
     });
 
-  function setUp() public {
+  function setUp() virtual public {
     proxyFactory = new TransparentProxyFactory();
     payloadsControllerImpl = new PayloadsControllerMock();
     shortExecutor = new Executor();
@@ -69,7 +69,7 @@ contract ExecutionChainRobotKeeperTest is Test {
         .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
         .delay +
       extraTime;
-    skip(skipTimeToTimelock);
+    vm.warp(skipTimeToTimelock);
 
     assertEq(uint256(payload.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
 
@@ -96,7 +96,7 @@ contract ExecutionChainRobotKeeperTest is Test {
         .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
         .delay +
       extraTime;
-    skip(skipTimeToTimelock);
+    vm.warp(skipTimeToTimelock);
 
     for (uint i = 0; i < 5; i++) {
       assertEq(
@@ -133,13 +133,13 @@ contract ExecutionChainRobotKeeperTest is Test {
       payloadIds[0]
     );
 
-    uint256 extraTime = 10;
+    uint256 extraTime = 15;
     uint256 skipTimeToTimelock = payload.queuedAt +
       payloadsController
         .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
         .delay +
       extraTime;
-    skip(skipTimeToTimelock);
+    vm.warp(skipTimeToTimelock);
 
     for (uint i = 0; i < 5; i++) {
       assertEq(
@@ -153,22 +153,24 @@ contract ExecutionChainRobotKeeperTest is Test {
     }
 
     for (uint i = 0; i < 5; i++) {
-      uint40 payloadId = uint40(payloadsController.getPayloadById(payloadIds[i]).state);
       assertEq(
-        uint256(payloadsController.getPayloadById(payloadId).state),
+        uint256(payloadsController.getPayloadById(payloadIds[i]).state),
         uint256(IPayloadsControllerCore.PayloadState.Executed)
       );
     }
   }
 
-  function _checkAndPerformUpKeep(ExecutionChainRobotKeeper executionChainRobotKeeper) internal {
+  function _checkAndPerformUpKeep(
+    ExecutionChainRobotKeeper executionChainRobotKeeper
+  ) internal virtual returns (bool) {
     (bool shouldRunKeeper, bytes memory performData) = executionChainRobotKeeper.checkUpkeep('');
     if (shouldRunKeeper) {
       executionChainRobotKeeper.performUpkeep(performData);
     }
+    return shouldRunKeeper;
   }
 
-  function _createPayloadAndQueue() internal returns (uint40) {
+  function _createPayloadAndQueue() internal virtual returns (uint40) {
     PayloadTest payload = new PayloadTest();
 
     IPayloadsControllerCore.ExecutionAction[]
@@ -181,7 +183,6 @@ contract ExecutionChainRobotKeeperTest is Test {
     actions[0].accessLevel = PayloadsControllerUtils.AccessControl.Level_1;
 
     uint40 payloadId = payloadsController.createPayload(actions);
-    // payloadsController.queue(payloadId);
     _queuePayloadWithId(
       payloadId,
       payloadsController.getPayloadById(payloadId).maximumAccessLevelRequired,
