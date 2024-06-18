@@ -27,7 +27,7 @@ contract GasCappedExecutionChainRobotKeeper is GasCappedRobotBase, ExecutionChai
    * @dev run off-chain, checks if payload should be executed
    *      also checks that the gas price of the network in within range to perform actions
    */
-  function checkUpkeep(bytes memory) public view override returns (bool, bytes memory) {
+  function checkUpkeep(bytes memory) public view virtual override returns (bool, bytes memory) {
     if (!isGasPriceInRange()) return (false, '');
 
     return super.checkUpkeep('');

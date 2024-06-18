@@ -82,4 +82,15 @@ contract GelatoGasCappedExecutionChainRobotKeeperTest is GasCappedExecutionChain
       uint256(IPayloadsControllerCore.PayloadState.Queued)
     );
   }
+
+  function _checkAndPerformUpKeep(
+    ExecutionChainRobotKeeper executionChainRobotKeeper
+  ) internal override returns (bool) {
+    (bool shouldRunKeeper, bytes memory encodedPerformData) = executionChainRobotKeeper.checkUpkeep('');
+    if (shouldRunKeeper) {
+      (bool status, ) = address(executionChainRobotKeeper).call(encodedPerformData);
+      assertTrue(status, 'Perform Upkeep Failed');
+    }
+    return shouldRunKeeper;
+  }
 }
