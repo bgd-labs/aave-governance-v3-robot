@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {IInitializableRobotOperator} from './IInitializableRobotOperator.sol';
+
 /**
  * @title IAaveCLRobotOperator
  * @author BGD Labs
  * @notice Defines the interface for the robot operator contract to perform admin actions on the automation keepers.
  **/
-interface IAaveCLRobotOperator {
+interface IAaveCLRobotOperator is IInitializableRobotOperator {
   /**
    * @dev Emitted when a keeper is registered using the operator contract.
    * @param id id of the keeper registered.
@@ -68,7 +70,31 @@ interface IAaveCLRobotOperator {
    * @dev Emitted when trigger config is configured for a log type robot using the operator contract.
    * @param id id of the keeper for which trigger config has been configured.
    */
-  event TriggerConfigSet(uint256 id);
+  event TriggerConfigSet(uint256 indexed id);
+
+  /**
+   * @dev Emitted when a new chainlink keeper registry is set on the operator contract.
+   * @param newKeeperRegistry address of the new chainlink keeper registry contract.
+   */
+  event KeeperRegistrySet(address indexed newKeeperRegistry);
+
+  /**
+   * @dev Emitted when a new chainlink keeper registrar is set on the operator contract.
+   * @param newKeeperRegistrar address of the new chainlink keeper registrar contract.
+   */
+  event KeeperRegistrarSet(address indexed newKeeperRegistrar);
+
+  /**
+   * @dev Emitted when a the keepers are migrated to a new chainlink keeper registry contract.
+   * @param ids array of ids all the chainlink keepers to migrate.
+   * @param newKeeperRegistry address of the new chainlink keeper registry contract to migrate to.
+   * @param newKeeperRegistrar address of the new chainlink keeper registrar contract associated with the registry.
+   */
+  event KeepersMigrated(
+    uint256[] indexed ids,
+    address indexed newKeeperRegistry,
+    address indexed newKeeperRegistrar
+  );
 
   /**
    * @notice holds the keeper info registered via the operator.
@@ -84,6 +110,7 @@ interface IAaveCLRobotOperator {
    * @notice method called by owner to register the automation robot keeper.
    * @param name name of keeper.
    * @param upkeepContract upkeepContract of the keeper.
+   * @param upkeepCheckData checkData of the keeper which get passed to the checkUpkeep.
    * @param gasLimit max gasLimit which the chainlink automation node can execute for the automation.
    * @param amountToFund amount of link to fund the keeper with.
    * @param triggerType type of robot keeper to register, 0 for conditional and 1 for event log based.
@@ -91,12 +118,13 @@ interface IAaveCLRobotOperator {
    * @return chainlink id for the registered keeper.
    **/
   function register(
-    string memory name,
+    string calldata name,
     address upkeepContract,
+    bytes calldata upkeepCheckData,
     uint32 gasLimit,
     uint96 amountToFund,
     uint8 triggerType,
-    bytes memory triggerConfig
+    bytes calldata triggerConfig
   ) external returns (uint256);
 
   /**
@@ -118,6 +146,13 @@ interface IAaveCLRobotOperator {
    * @param id - id of the chainlink registered keeper to withdraw funds of.
    **/
   function withdrawLink(uint256 id) external;
+
+  /**
+   * @notice method called by the owner to migrate the keepers to a newer version of chainlink automation.
+   * @param newRegistry address of the new chainlink registry to migrate the keepers to.
+   * @param newRegistrar address of the new associated chainlink registrar of the new registry.
+   **/
+  function migrate(address newRegistry, address newRegistrar) external;
 
   /**
    * @notice method called by owner / robot guardian to pause the upkeep robot keeper.
@@ -168,6 +203,18 @@ interface IAaveCLRobotOperator {
   function setTriggerConfig(uint256 id, bytes calldata triggerConfig) external;
 
   /**
+   * @notice method called by owner to set the address of chainlink keeper registry contract.
+   * @param newRegistry address of the new chainlink keeper registry contract to set.
+   */
+  function setRegistry(address newRegistry) external;
+
+  /**
+   * @notice method called by owner to set the address of chainlink keeper registrar contract.
+   * @param newRegistrar address of the new chainlink keeper registrar contract to set.
+   */
+  function setRegistrar(address newRegistrar) external;
+
+  /**
    * @notice method to get the withdraw address for the robot operator contract.
    * @return withdraw address to send excess link to.
    **/
@@ -183,20 +230,26 @@ interface IAaveCLRobotOperator {
   function getKeeperInfo(uint256 id) external view returns (KeeperInfo memory);
 
   /**
-   * @notice method to get the address of ERC-677 link token.
-   * @return link token address.
-   */
-  function LINK_TOKEN() external returns (address);
-
-  /**
    * @notice method to get the address of chainlink keeper registry contract.
    * @return keeper registry address.
    */
-  function KEEPER_REGISTRY() external returns (address);
+  function getRegistry() external returns (address);
 
   /**
    * @notice method to get the address of chainlink keeper registrar contract.
    * @return keeper registrar address.
    */
-  function KEEPER_REGISTRAR() external returns (address);
+  function getRegistrar() external returns (address);
+
+  /**
+   * @notice method to get the address of ERC-677 link token.
+   * @return link token address.
+   */
+  function getLinkToken() external returns (address);
+
+  /**
+   * @notice method to get of all the ids of keepers registered by the robot operator which have not been cancelled.
+   * @return array of registered keeper ids.
+   */
+  function getKeepersList() external returns (uint256[] memory);
 }

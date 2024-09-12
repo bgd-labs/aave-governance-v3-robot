@@ -99,6 +99,64 @@ The keepers have the following functions:
 
   - For voting chain keeper, we also perform the register roots action for the block hash only once and flag it, as it requests data off-chain to submit roots and to avoid calling it multiple times.
 
+## Gas Capped Robots:
+
+Similar to the governance robots `ExecutionChainRobotKeeper`, `GovernanceChainRobotKeeper`, `VotingChainRobotKeeper` with an additional functionality of executing actions only when the current network gas price is under the configured gas price. The robot uses chainlink fast-gas feed to fetch the current network gas prices. Since chainlink fast-gas feed is currently only available on mainnet, the gas-capped robots will be used only on ethereum.
+
+## Gelato Gas Capped Robots:
+
+Extending the gas capped feature on robots which is used to limit the execution on actions based on network gas prices, Gelato Gas Capped Robots is intended to be used via Gelato functions. The major difference from Gas Capped Robots which are used on chainlink automation is that on Gelato Gas Capped Robots we use `tx.gasprice` to fetch the current network gas price instead of the chainlink fast gas feed as Gelato natively supports `tx.gasprice` in their checker function.
+
+## Aave CL Robot Operator:
+
+The contract to perform admin actions on the Aave Robot Keepers.
+
+_Note: The Robot Operator contract is configured to be upgradable by the governance, in order to be compatible with future interface changes on chainlink registry contract._
+
+<img src="./robot-operator.png" alt="Aave Robot Operator v2" width="100%" height="100%">
+
+<br />
+
+- `register()`:
+
+  Called by the governance level 1 executor (owner) to register the Chainlink Keeper with the admin of the keeper as the operator contract.
+
+- `cancel()`:
+
+  Called by the governance level 1 executor (owner) to cancel the Chainlink Keeper.
+
+- `migrate()`:
+
+  Called by the governance level 1 executor (owner) to migrate all the robots from the old chainlink version to the newer one.
+
+- `withdrawLink()`:
+
+  Can be called in a permissionless way by anyone to withdraw link from the Chainlink Keeper to the Aave Collector. Note that we can only withdraw link after a keeper has been canceled and 50 blocks have passed after being canceled.
+
+- `setGasLimit()`:
+
+  Called by the governance level 1 executor (owner) / robot guardian to set the max gas limit for execution by the Chainlink Keeper.
+
+- `setTriggerConfig()`:
+
+  Called by the governance level 1 executor (owner) / robot guardian to set the trigger config if it is a event based robot.
+
+- `refillKeeper()`:
+
+  Can be called in a permissionless way by anyone to refill the keeper with link tokens for gas. Note that the sender has to approve link tokens to the operator contract first in order to refill the Chainlink Keeper.
+
+- `setWithdrawAddress()`:
+
+  Called by the governance level 1 executor (owner), to set the withdraw address which is initially set to the Aave Collector, which is used to receive link after canceling and withdrawing funds from the Chainlink Keeper.
+
+- `setRegistry()`:
+
+  Called by the governance level 1 executor (owner) to set the new chainlink registry contract.
+
+- `setRegistrar()`:
+
+  Called by the governance level 1 executor (owner) to set the new chainlink registrar contract.
+
 ## API Consumer Contract:
 
 The chainlink API consumer-compatible smart contracts are deployed on the voting chain networks to request data off-chain by calling the respective APIs to register the roots for the voting tokens.
