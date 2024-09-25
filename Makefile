@@ -59,3 +59,6 @@ deploy-metis-execution-keeper :; forge script ./scripts/GelatoGasCappedExecution
 
 # Gnosis deployments
 deploy-gnosis-execution-keeper :; forge script ./scripts/GelatoGasCappedExecutionChainRobotKeeper.s.sol:DeployGnosis --rpc-url gnosis --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_GNOSIS} --gas-estimate-multiplier 175 --verify -vvvv
+
+# zkSync deployments
+deploy-zksync-execution-keeper :; FOUNDRY_PROFILE=zksync forge script --zksync .zksync/scripts/GelatoGasCappedExecutionChainRobotKeeper.s.sol:DeployZkSync --rpc-url zksync --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_GNOSIS} --gas-estimate-multiplier 175 --verify -vvvv
