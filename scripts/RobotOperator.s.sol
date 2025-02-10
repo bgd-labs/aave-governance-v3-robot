@@ -4,7 +4,27 @@ pragma solidity ^0.8.0;
 import {Script} from 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
 import {AaveCLRobotOperator} from 'src/contracts/AaveCLRobotOperator.sol';
-import {AaveV3Ethereum, MiscEthereum, GovernanceV3Ethereum, AaveV3Polygon, MiscPolygon, GovernanceV3Polygon, AaveV3Optimism, MiscOptimism, GovernanceV3Optimism, AaveV3Arbitrum, MiscArbitrum, GovernanceV3Arbitrum, AaveV3Avalanche, MiscAvalanche, GovernanceV3Avalanche, AaveV3Base, MiscBase, GovernanceV3Base, AaveV3BNB, MiscBNB, GovernanceV3BNB} from 'aave-address-book/AaveAddressBook.sol';
+import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
+import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
+import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
+import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
+import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
+import {MiscOptimism} from 'aave-address-book/MiscOptimism.sol';
+import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
+import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
+import {MiscArbitrum} from 'aave-address-book/MiscArbitrum.sol';
+import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
+import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
+import {MiscAvalanche} from 'aave-address-book/MiscAvalanche.sol';
+import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
+import {AaveV3Base} from 'aave-address-book/AaveV3Base.sol';
+import {MiscBase} from 'aave-address-book/MiscBase.sol';
+import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
+import {AaveV3BNB} from 'aave-address-book/AaveV3BNB.sol';
+import {MiscBNB} from 'aave-address-book/MiscBNB.sol';
+import {GovernanceV3BNB} from 'aave-address-book/GovernanceV3BNB.sol';
 import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 
 library DeployRobotOperator {
