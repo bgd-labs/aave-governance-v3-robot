@@ -65,3 +65,6 @@ deploy-zksync-execution-keeper :; FOUNDRY_PROFILE=zksync forge script --zksync .
 
 # Linea deployments
 deploy-linea-execution-keeper :; FOUNDRY_PROFILE=linea forge script ./scripts/GelatoGasCappedExecutionChainRobotKeeper.s.sol:DeployLinea --rpc-url linea --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --etherscan-api-key ${ETHERSCAN_API_KEY_LINEA} --gas-estimate-multiplier 175 --verify -vvvv
+
+# Sonic deployments
+deploy-sonic-execution-keeper :; forge script ./scripts/GelatoGasCappedExecutionChainRobotKeeper.s.sol:DeploySonic --rpc-url sonic --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --etherscan-api-key ${ETHERSCAN_API_KEY_SONIC} --gas-estimate-multiplier 175 --verify -vvvv
