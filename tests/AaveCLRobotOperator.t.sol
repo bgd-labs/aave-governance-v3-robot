@@ -34,12 +34,12 @@ contract AaveCLRobotOperatorTest is Test {
   function setUp() public {
     vm.createSelectFork(
       'optimism',
-      117270571 // Mar-11-2024
+      132700949 // Mar-3-2025
     );
     aaveCLRobotOperator = AaveCLRobotOperator(
       DeployRobotOperator._deploy(
         MiscOptimism.TRANSPARENT_PROXY_FACTORY,
-        MiscOptimism.PROXY_ADMIN,
+        GovernanceV3Optimism.EXECUTOR_LVL_1,
         REGISTRY,
         REGISTRAR,
         WITHDRAW_ADDRESS,
