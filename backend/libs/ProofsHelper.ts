@@ -60,7 +60,8 @@ export function prepareBlockRLP(rawBlock: any) {
     BigNumber.from(rawBlock.excessBlobGas).isZero()
       ? "0x"
       : BigNumber.from(rawBlock.excessBlobGas).toHexString(),
-    rawBlock.parentBeaconBlockRoot
+    rawBlock.parentBeaconBlockRoot,
+    rawBlock.requestsHash,
   ];
   return ethers.utils.RLP.encode(rawData);
 }
