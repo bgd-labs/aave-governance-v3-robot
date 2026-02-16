@@ -1,0 +1,12 @@
+{
+  "schedule": "*/2 * * * *",
+  "evms": [
+    {
+      "chainName": "ethereum-mainnet-base-1",
+      "mailboxAddress": "0x1df462e2712496373a347f8ad10802a5e95f053d",
+      "automationAddresses": [
+        "0x48b5bd96e36a9c0d0ea3f07d3b3da34bbd514fb3"
+      ]
+    }
+  ]
+}
