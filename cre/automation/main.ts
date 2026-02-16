@@ -11,6 +11,7 @@ import {
 } from '@chainlink/cre-sdk';
 import { encodeFunctionData, decodeFunctionResult, zeroAddress, encodeAbiParameters, parseAbiParameters, type Hex } from 'viem';
 import { ICLAutomation } from '../contracts/abi/ICLAutomation';
+import { IMailboxCRE } from '../contracts/abi/IMailboxCRE';
 
 type NetworkConfig = {
   chainName: string;
@@ -67,26 +68,48 @@ const processAutomation = (
     [automationAddress as Hex, performUpkeepCalldata]
   );
 
-  const reportResponse = runtime
-    .report({
-      encodedPayload: hexToBase64(mailboxReportData),
-      encoderName: 'evm',
-      signingAlgo: 'ecdsa',
-      hashingAlgo: 'keccak256',
-    })
-    .result();
+  try {
+    const onReportCalldata = encodeFunctionData({
+      abi: IMailboxCRE,
+      functionName: 'onReport',
+      args: ['0x', mailboxReportData],
+    });
+    const estimateGasResult = evmClient
+      .estimateGas(runtime, {
+        msg: encodeCallMsg({
+          from: zeroAddress,
+          to: mailboxAddress as Hex,
+          data: onReportCalldata,
+        }),
+      })
+      .result();
 
-  const writeReportResult = evmClient
-    .writeReport(runtime, {
-      receiver: mailboxAddress,
-      report: reportResponse,
-      gasConfig: { gasLimit: '500000' },
-    })
-    .result();
+    const estimatedGas = estimateGasResult.gas.toString();
+    runtime.log(`[${chainName}] estimate gas for performUpkeep via onReport(${automationAddress}): ${estimatedGas}`);
 
-  const txHash = bytesToHex(writeReportResult.txHash || new Uint8Array(32));
-  runtime.log(`[${chainName}] tx: ${txHash}`);
-  return txHash;
+    const reportResponse = runtime
+      .report({
+        encodedPayload: hexToBase64(mailboxReportData),
+        encoderName: 'evm',
+        signingAlgo: 'ecdsa',
+        hashingAlgo: 'keccak256',
+      })
+      .result();
+    const writeReportResult = evmClient
+      .writeReport(runtime, {
+        receiver: mailboxAddress,
+        report: reportResponse,
+        gasConfig: { gasLimit: estimatedGas },
+      })
+      .result();
+
+    const txHash = bytesToHex(writeReportResult.txHash || new Uint8Array(32));
+    runtime.log(`[${chainName}] tx: ${txHash}`);
+    return txHash;
+  } catch (e) {
+    runtime.log(`[${chainName}] estimate gas failed for performUpkeep via onReport(${automationAddress}): ${e}`);
+    return null;
+  }
 };
 
 const createAutomationHandler = (
@@ -110,15 +133,20 @@ const createAutomationHandler = (
 
     const evmClient = new cre.capabilities.EVMClient(network.chainSelector.selector);
 
-    const txHash = processAutomation(
-      runtime,
-      evmClient,
-      automationAddress,
-      mailboxAddress,
-      chainName
-    );
+    try {
+      const txHash = processAutomation(
+        runtime,
+        evmClient,
+        automationAddress,
+        mailboxAddress,
+        chainName
+      );
 
-    return txHash ?? 'No upkeep needed';
+      return txHash ?? 'No upkeep needed';
+    } catch (e) {
+      runtime.log(`[${chainName}] processAutomation failed for ${automationAddress}: ${e}`);
+      return 'Processing failed';
+    }
   };
 };
 
