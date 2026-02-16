@@ -1,6 +1,5 @@
 import {
 	bytesToHex,
-	type CronPayload,
 	cre,
   CronCapability,
 	encodeCallMsg,
@@ -31,49 +30,49 @@ const processAutomation = (
   mailboxAddress: string,
   chainName: string
 ): string | null => {
-  const callData = encodeFunctionData({
+  const checkUpkeepCalldata = encodeFunctionData({
     abi: ICLAutomation,
-    functionName: "checkUpkeep",
+    functionName: 'checkUpkeep',
     args: ['0x']
   });
 
-  const contractCall = evmClient
+  const checkUpkeepCall = evmClient
     .callContract(runtime, {
       call: encodeCallMsg({
         from: zeroAddress,
         to: automationAddress as Hex,
-        data: callData,
+        data: checkUpkeepCalldata,
       })
     })
     .result();
 
-  const checkData = decodeFunctionResult({
+  const checkUpkeepResult = decodeFunctionResult({
     abi: ICLAutomation,
-    functionName: "checkUpkeep",
-    data: bytesToHex(contractCall.data),
+    functionName: 'checkUpkeep',
+    data: bytesToHex(checkUpkeepCall.data),
   });
 
-  runtime.log(`[${chainName}] checkUpkeep(${automationAddress}): ${checkData[0]}`);
+  runtime.log(`[${chainName}] checkUpkeep(${automationAddress}): ${checkUpkeepResult[0]}`);
 
-  if (!checkData[0]) return null;
+  if (!checkUpkeepResult[0]) return null; // automation should not run as the checker returns false
 
-  const performData = encodeFunctionData({
+  const performUpkeepCalldata = encodeFunctionData({
     abi: ICLAutomation,
-    functionName: "performUpkeep",
-    args: [checkData[1]]
+    functionName: 'performUpkeep',
+    args: [checkUpkeepResult[1]]
   });
 
-  const encodedAutomationData = encodeAbiParameters(
+  const mailboxReportData = encodeAbiParameters(
     parseAbiParameters('address, bytes'),
-    [automationAddress as Hex, performData]
+    [automationAddress as Hex, performUpkeepCalldata]
   );
 
   const reportResponse = runtime
     .report({
-      encodedPayload: hexToBase64(encodedAutomationData),
-      encoderName: "evm",
-      signingAlgo: "ecdsa",
-      hashingAlgo: "keccak256",
+      encodedPayload: hexToBase64(mailboxReportData),
+      encoderName: 'evm',
+      signingAlgo: 'ecdsa',
+      hashingAlgo: 'keccak256',
     })
     .result();
 
@@ -90,49 +89,57 @@ const processAutomation = (
   return txHash;
 };
 
-const onCronTrigger = (runtime: Runtime<Config>): string => {
-  runtime.log("Automation workflow triggered.");
+const createAutomationHandler = (
+  chainName: string,
+  mailboxAddress: string,
+  automationAddress: string
+) => {
+  return (runtime: Runtime<Config>): string => {
+    runtime.log(`[${chainName}] Handler triggered for ${automationAddress}`);
 
-  const results: string[] = [];
-
-  for (const networkConfig of runtime.config.evms) {
     const network = getNetwork({
       chainFamily: 'evm',
-      chainSelectorName: networkConfig.chainName,
+      chainSelectorName: chainName,
       isTestnet: false,
     });
 
     if (!network) {
-      runtime.log(`Network not found: ${networkConfig.chainName}`);
-      continue;
+      runtime.log(`Network not found: ${chainName}`);
+      return 'Network not found';
     }
 
     const evmClient = new cre.capabilities.EVMClient(network.chainSelector.selector);
 
-    for (const automationAddress of networkConfig.automationAddresses) {
-      const txHash = processAutomation(
-        runtime,
-        evmClient,
-        automationAddress,
-        networkConfig.mailboxAddress,
-        networkConfig.chainName
-      );
-      if (txHash) results.push(txHash);
-    }
-  }
+    const txHash = processAutomation(
+      runtime,
+      evmClient,
+      automationAddress,
+      mailboxAddress,
+      chainName
+    );
 
-  return results.length > 0 ? results.join(',') : "No upkeep needed";
+    return txHash ?? 'No upkeep needed';
+  };
 };
 
 const initWorkflow = (config: Config) => {
   const cron = new CronCapability();
+  const trigger = cron.trigger({ schedule: config.schedule });
 
-  return [
-    handler(
-      cron.trigger({ schedule: config.schedule }),
-      onCronTrigger
-    )
-  ];
+  const handlers = config.evms
+    .filter((network) => network.chainName && network.automationAddresses.length > 0)
+    .flatMap((network) =>
+      network.automationAddresses
+        .filter((addr) => addr)
+        .map((automationAddress) =>
+          handler(
+            trigger,
+            createAutomationHandler(network.chainName, network.mailboxAddress, automationAddress)
+          )
+        )
+    );
+
+  return handlers;
 };
 
 export async function main() {
