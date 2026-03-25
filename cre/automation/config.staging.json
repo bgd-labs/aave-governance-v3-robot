@@ -4,9 +4,8 @@
     {
       "chainName": "ethereum-mainnet-base-1",
       "mailboxAddress": "0x1df462e2712496373a347f8ad10802a5e95f053d",
-      "automationAddresses": [
-        "0xde4d43edf941e478c23f1f7bf44078273b1e8b1f",
-        "0xf93993242F9624a42C86ea021cc314931BaacEaF"
+      "automations": [
+        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x" }
       ]
     }
   ]

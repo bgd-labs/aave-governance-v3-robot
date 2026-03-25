@@ -2,3 +2,5 @@
 
 tmp.js
 tmp.wasm
+.cre_*
+binary.*
