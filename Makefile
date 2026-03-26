@@ -15,6 +15,11 @@ git-diff :
 	@mkdir -p diffs
 	@printf '%s\n%s\n%s\n' "\`\`\`diff" "$$(git diff --no-index --diff-algorithm=patience --ignore-space-at-eol ${before} ${after})" "\`\`\`" > diffs/${out}.md
 
+# Generic deploy targets (usage: make deploy-ledger contract=scripts/Foo.s.sol:Bar chain=mainnet)
+deploy-ledger-zk :; FOUNDRY_PROFILE=zksync forge script $(if $(filter zksync,${chain}),--zksync) ${contract} --rpc-url ${chain} $(if ${dry},--sender 0x73AF3bcf944a6559933396c1577B257e2054D935 -vvvv, --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow --broadcast --verifier etherscan)
+deploy-ledger :; forge script $(if $(filter zksync,${chain}),--zksync) ${contract} --rpc-url ${chain} $(if ${dry},--sender 0x73AF3bcf944a6559933396c1577B257e2054D935 -vvvv, --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow --broadcast) $(if ${legacy}, --legacy, )
+deploy-pk :; forge script $(if $(filter zksync,${chain}),--zksync) ${contract} --rpc-url ${chain} $(if ${dry},--sender 0x73AF3bcf944a6559933396c1577B257e2054D935 -vvvv, --private-key ${PRIVATE_KEY} --verify -vvvv --slow --broadcast)
+
 # Mainnet deployments
 deploy-mainnet-gov-keeper :; forge script ./scripts/GovernanceChainRobotKeeper.s.sol:DeployMainnet --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_MAINNET} --gas-estimate-multiplier 175 --verify -vvvv
 deploy-mainnet-execution-keeper :; forge script ./scripts/ExecutionChainRobotKeeper.s.sol:DeployMainnet --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_MAINNET} --gas-estimate-multiplier 175 --verify -vvvv
@@ -52,7 +57,6 @@ deploy-bnb-operator :; forge script ./scripts/RobotOperator.s.sol:DeployBNB --rp
 # Base deployments
 deploy-base-operator :; forge script ./scripts/RobotOperator.s.sol:DeployBase --rpc-url base --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_BASE} --gas-estimate-multiplier 175 --verify -vvvv
 deploy-base-execution-keeper :; forge script ./scripts/ExecutionChainRobotKeeper.s.sol:DeployBase --rpc-url base --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_BASE} --gas-estimate-multiplier 175 --verify -vvvv
-deploy-base-operator :; forge script ./scripts/RobotOperator.s.sol:DeployBase --rpc-url base --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER}  --etherscan-api-key ${ETHERSCAN_API_KEY_BASE} --gas-estimate-multiplier 175 --verify -vvvv
 
 # Metis deployments
 deploy-metis-execution-keeper :; forge script ./scripts/GelatoGasCappedExecutionChainRobotKeeper.s.sol:DeployMetis --rpc-url metis --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --etherscan-api-key ${ETHERSCAN_API_KEY_METIS} --gas-estimate-multiplier 175 --verify -vvvv

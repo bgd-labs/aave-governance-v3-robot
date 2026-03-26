@@ -26,7 +26,7 @@ evm_version = 'paris'
 compile = true
 fallback_oz = true
 mode = '3'
-zksolc = '1.5.3'
+zksolc = '1.5.13'
 
 [profile.linea]
 evm_version = 'london'
@@ -48,6 +48,12 @@ scroll="${RPC_SCROLL}"
 zksync = "${RPC_ZKSYNC}"
 linea = "${RPC_LINEA}"
 sonic = "${RPC_SONIC}"
+ink = "${RPC_INK}"
+plasma = "${RPC_PLASMA}"
+celo = "${RPC_CELO}"
+xlayer = "${RPC_XLAYER}"
+mantle = "${RPC_MANTLE}"
+megaeth = "${RPC_MEGAETH}"
 
 [etherscan]
 mainnet = { key="${ETHERSCAN_API_KEY_MAINNET}", chain=1 }

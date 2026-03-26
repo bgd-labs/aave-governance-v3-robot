@@ -1,23 +1,93 @@
 {
-  "schedule": "*/2 * * * *",
+  "schedule": "*/5 * * * *",
   "evms": [
     {
-      "chainName": "ethereum-mainnet-base-1",
-      "mailboxAddress": "0x1df462e2712496373a347f8ad10802a5e95f053d",
+      "chainName": "gnosis_chain-mainnet",
+      "mailboxAddress": "0x9f3Cc7b6f5F75d97735763c22cb280dbF90f17a2",
       "automations": [
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" },
-        { "address": "0xd90f09ea5ee893b8c0564719e855f1cf0455d894", "checkData": "0x", "automationContractType": "gelato" }
+        { "address": "0x45918bB1D3F73904a30Ffc3eD11CdB1c05eBF726", "checkData": "0x", "automationContractType": "gelato" },
+        { "address": "0x8f486A7Bee4A31895ED9b96CA4433167bbc2f270", "checkData": "0x", "automationContractType": "gelato" },
+        { "address": "0x5f65E68ddb5Cfdb5B64bD8562dBA08Af6b26818c", "checkData": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000", "automationContractType": "chainlink" },
+        { "address": "0x5f65E68ddb5Cfdb5B64bD8562dBA08Af6b26818c", "checkData": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001", "automationContractType": "chainlink" }
+      ]
+    },
+    {
+      "chainName": "ethereum-mainnet-ink-1",
+      "mailboxAddress": "0xb0a73671c97bac9ba899cd1a23604fd2278cd02a",
+      "automations": [
+        { "address": "0xd882551fa48e3ca5353e49d5520b5905aa78e3a4", "checkData": "0x", "automationContractType": "gelato" },
+        { "address": "0xC18ECB3DEf8BAaB2be2714324c5AdA75608e0a48", "checkData": "0x", "automationContractType": "gelato" },
+        { "address": "0xf36400ebdBaFf0EEa7f98AD575759177f285250B", "checkData": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000", "automationContractType": "chainlink" },
+        { "address": "0xf36400ebdBaFf0EEa7f98AD575759177f285250B", "checkData": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001", "automationContractType": "chainlink" },
+        { "address": "0xf36400ebdBaFf0EEa7f98AD575759177f285250B", "checkData": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002", "automationContractType": "chainlink" }
+      ]
+    },
+    {
+      "chainName": "ethereum-mainnet-linea-1",
+      "mailboxAddress": "0x3240e5829dd41d38d3559d5c56656f722b1d63cf",
+      "automations": [
+        { "address": "0xD882551FA48E3Ca5353e49d5520B5905aa78E3A4", "checkData": "0x", "automationContractType": "gelato" },
+        { "address": "0x943AcD0c93d7a8Bee7dA5Fd0DC3d0028237074d6", "checkData": "0x", "automationContractType": "gelato" },
+        { "address": "0x045Cfa3fe742B7931ee53A5f63E7924723Eb67a0", "checkData": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000", "automationContractType": "chainlink" }
+      ]
+    },
+    {
+      "chainName": "plasma-mainnet",
+      "mailboxAddress": "0xad87684D27e6e58F055E6878A9F11F8c52A5b0F5",
+      "automations": [
+        { "address": "0xA2430ab7Ac492D70C2Bd4EA83FeAf6F8AF3e165C", "checkData": "0x", "automationContractType": "gelato" },
+        { "address": "0xa5d38529b58ccf8cc39e583d8a517bd5dcb7df38", "checkData": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000", "automationContractType": "chainlink" },
+        { "address": "0xa5d38529b58ccf8cc39e583d8a517bd5dcb7df38", "checkData": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001", "automationContractType": "chainlink" }
+      ]
+    },
+    {
+      "chainName": "sonic-mainnet",
+      "mailboxAddress": "0x42502a9213171d33902256c61e0b6f5c25eb9481",
+      "automations": [
+        { "address": "0x943AcD0c93d7a8Bee7dA5Fd0DC3d0028237074d6", "checkData": "0x", "automationContractType": "gelato" },
+        { "address": "0xBDF2e1A49894A306Eb76b89504928b3f509A3a16", "checkData": "0x", "automationContractType": "gelato" }
+      ]
+    },
+    {
+      "chainName": "celo-mainnet",
+      "mailboxAddress": "0xABcaf379C31626190F275f9a5Ba5d6ebf19F9903",
+      "automations": [
+        { "address": "0xaD44D0198B3250e05B919676dA767dBa5D0B46B9", "checkData": "0x", "automationContractType": "chainlink" }
+      ]
+    },
+    {
+      "chainName": "ethereum-mainnet-scroll-1",
+      "mailboxAddress": "0xD549f5834bA4adD1c42f766581Ea7EF73f341bF5",
+      "automations": [
+        { "address": "0x70141be0994C5C2be900AD9f03aB1074dC40F0B9", "checkData": "0x", "automationContractType": "chainlink" }
+      ]
+    },
+    {
+      "chainName": "ethereum-mainnet-xlayer-1",
+      "mailboxAddress": "0xb5a1Fe36dcf5Ba149Cb8d90A03f4709141eE5442",
+      "automations": [
+        { "address": "0x2F9fDD0D80843b21A7e2c7bfe2A6278231A5683e", "checkData": "0x", "automationContractType": "chainlink" }
+      ]
+    },
+    {
+      "chainName": "ethereum-mainnet-mantle-1",
+      "mailboxAddress": "0x943AcD0c93d7a8Bee7dA5Fd0DC3d0028237074d6",
+      "automations": [
+        { "address": "0x745773bAE23fFf28A1fE3605807292480CcCeA67", "checkData": "0x", "automationContractType": "chainlink" }
+      ]
+    },
+    {
+      "chainName": "megaeth-mainnet",
+      "mailboxAddress": "0xa7139a9D61b88c1d8130940cFFC0f92129bE5e52",
+      "automations": [
+        { "address": "0x4239D8eeBe657E4D6C94396A339650cb8547682b", "checkData": "0x", "automationContractType": "chainlink" }
+      ]
+    },
+    {
+      "chainName": "ethereum-mainnet-zksync-1",
+      "mailboxAddress": "0x116aa5af5154f3a28b2ed8A445312a5eC064CB6e",
+      "automations": [
+        { "address": "0x89A7f62acEa329371090c805f3Aa06Bb8729056D", "checkData": "0x", "automationContractType": "gelato" }
       ]
     }
   ]

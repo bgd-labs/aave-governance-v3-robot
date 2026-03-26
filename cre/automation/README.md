@@ -1,53 +1,104 @@
-# Typescript Simple Workflow Example
+# Aave Robots — CRE Automation Workflow
 
-This template provides a simple Typescript workflow example. It shows how to create a simple "Hello World" workflow using Typescript.
+This workflow uses the Chainlink Runtime Environment (CRE) to automate Aave robot contracts. On each cron tick it calls `checkUpkeep` on every configured robot, and if work is needed it submits a signed CRE report to the `MailboxCRE` contract which forwards the `performUpkeep` call on-chain.
 
-Steps to run the example
-
-## 1. Update .env file
-
-You need to add a private key to env file. This is specifically required if you want to simulate chain writes. For that to work the key should be valid and funded.
-If your workflow does not do any chain write then you can just put any dummy key as a private key. e.g.
+## Architecture
 
 ```
-CRE_ETH_PRIVATE_KEY=0000000000000000000000000000000000000000000000000000000000000001
+CRE Workflow (cron)
+  └─ checkUpkeep(robot)          # off-chain read
+       └─ [upkeep needed]
+            └─ runtime.report()  # sign & encode payload
+                 └─ writeReport → MailboxCRE.onReport()
+                                       └─ robot.performUpkeep()
 ```
 
-Note: Make sure your `workflow.yaml` file is pointing to the config.json, example:
+### MailboxCRE
 
-```yaml
-staging-settings:
-  user-workflow:
-    workflow-name: "hello-world"
-  workflow-artifacts:
-    workflow-path: "./main.ts"
-    config-path: "./config.json"
+`MailboxCRE` ([src/contracts/MailboxCRE.sol](../../src/contracts/MailboxCRE.sol)) is the on-chain receiver. It implements the CRE `IReceiver` interface and, on `onReport`, ABI-decodes the report into `(address target, bytes calldata)` and calls the target directly.
+
+No caller or forwarder checks are enforced — this is intentional. The robot contracts themselves are permissionless (anyone can call `performUpkeep`), so restricting who may deliver a report provides no security benefit.
+
+## Config files
+
+Two configs are committed, one per environment:
+
+| File | Target | Purpose |
+|------|--------|---------|
+| `config.production.json` | `production-settings` | Full set of robots |
+| `config.staging.json` | `staging-settings` | For testing |
+
+### Config schema
+
+```jsonc
+{
+  "schedule": "*/5 * * * *",   // cron expression for how often to run
+  "evms": [
+    {
+      "chainName": "ethereum-mainnet-base-1",      // CRE chain selector name
+      "mailboxAddress": "0x...",                   // deployed MailboxCRE address
+      "automations": [
+        {
+          "address": "0x...",                      // robot contract address
+          "checkData": "0x",                       // passed to checkUpkeep (use "0x" if unused)
+          "automationContractType": "chainlink"    // "chainlink" | "gelato"
+        }
+      ]
+    }
+  ]
+}
 ```
 
-## 2. Install dependencies
+`automationContractType` controls how the upkeep calldata is built:
+- `"chainlink"` — the workflow encodes `performUpkeep(checkUpkeepResult.performData)`.
+- `"gelato"` — `checkUpkeep` already returns the full encoded calldata, so it is forwarded as-is.
 
-If `bun` is not already installed, see https://bun.com/docs/installation for installing in your environment.
+## Setup
+
+If `bun` is not already installed, see https://bun.sh/docs/installation.
 
 ```bash
-cd <workflow-name> && bun install
+cd cre/automation && bun install
 ```
 
-Example: For a workflow directory named `hello-world` the command would be:
+## Simulate
+
+Run from the **project root** (`cre/` parent):
 
 ```bash
-cd hello-world && bun install
+# staging (single robot)
+cre workflow simulate ./automation --target=staging-settings
+
+# production (all robots)
+cre workflow simulate ./automation --target=production-settings
 ```
 
-## 3. Simulate the workflow
+Simulation performs the full off-chain logic including `checkUpkeep` reads and gas estimation, but does not submit any transactions.
 
-Run the command from <b>project root directory</b>
+## Deploy
 
 ```bash
-cre workflow simulate <path-to-workflow-directory> --target=staging-settings
+# staging
+cre workflow deploy ./automation --target=staging-settings
+
+# production
+cre workflow deploy ./automation --target=production-settings
 ```
 
-Example: For workflow named `hello-world` the command would be:
+The workflow name is set in `workflow.yaml` (`automation-staging` / `automation-production`). Deploying again with the same name updates the existing workflow.
 
-```bash
-cre workflow simulate ./hello-world --target=staging-settings
+## Adding a new robot
+
+1. Add an entry to the `automations` array in `config.production.json` (and optionally `config.staging.json`):
+
+```json
+{
+  "address": "0x<robot-address>",
+  "checkData": "0x",
+  "automationContractType": "chainlink"
+}
 ```
+
+2. Make sure a `MailboxCRE` is deployed on that chain and its address is set as `mailboxAddress`.
+
+3. Simulate, then deploy.
