@@ -13,12 +13,12 @@ export const processAutomation = (
   checkData: string,
   automationContractType: AutomationContractType
 ): string | null => {
+  // call checkUpkeep on the automation robot contract to check if automation should be run
   const checkUpkeepCalldata = encodeFunctionData({
     abi: ICLAutomation,
     functionName: 'checkUpkeep',
     args: [checkData as Hex],
   });
-
   const checkUpkeepCall = evmClient
     .callContract(runtime, {
       call: encodeCallMsg({
@@ -28,17 +28,19 @@ export const processAutomation = (
       }),
     })
     .result();
-
   const checkUpkeepResult = decodeFunctionResult({
     abi: ICLAutomation,
     functionName: 'checkUpkeep',
     data: bytesToHex(checkUpkeepCall.data),
   });
-
   runtime.log(`[${chainName}] checkUpkeep(${automationAddress}): ${checkUpkeepResult[0]}`);
-  if (!checkUpkeepResult[0]) return null; // automation should not run as the checker returns false
 
-  // as in gelato automation contracts `checkUpkeep()` method returns with encoded function data, so we skip encoding in that case
+  // if checkUpkeep on the automation robot contract returns false, automation should not be run
+  if (!checkUpkeepResult[0]) return null;
+
+  // mailbox is the intermediary contract, which forwards the call to our automation robot contract in order to perform on-chain write
+  // in chainlink automation contract, checkUpkeep method returns the checkData which is not encoded with function selector and in gelato automation
+  // contract, the checkUpkeep method returns the bytes encoded data, hence here we skip encoding when the automation contract type is gelato
   const mailboxPayload =
     automationContractType === 'chainlink'
       ? encodeFunctionData({
@@ -47,18 +49,17 @@ export const processAutomation = (
           args: [checkUpkeepResult[1]],
         })
       : checkUpkeepResult[1];
-
   const mailboxReportData = encodeAbiParameters(
     parseAbiParameters('address, bytes'),
     [automationAddress as Hex, mailboxPayload]
   );
-
   const onReportCalldata = encodeFunctionData({
     abi: IMailboxCRE,
     functionName: 'onReport',
     args: ['0x', mailboxReportData],
   });
 
+  // we estimate-gas before performing on-chain write, so in case where tx is failing in simulation we do not write on-chain and skip the execution
   try {
     const estimateGasResult = evmClient
       .estimateGas(runtime, {
@@ -75,6 +76,7 @@ export const processAutomation = (
     return null;
   }
 
+  // sign and send the on-chain write to the mailbox contract, which forwards write to the automation contract
   const reportResponse = runtime
     .report({
       encodedPayload: hexToBase64(mailboxReportData),
@@ -83,7 +85,6 @@ export const processAutomation = (
       hashingAlgo: 'keccak256',
     })
     .result();
-
   const writeReportResult = evmClient
     .writeReport(runtime, {
       receiver: mailboxAddress,
@@ -93,6 +94,7 @@ export const processAutomation = (
 
   if (!writeReportResult.txHash) throw new Error(`[${chainName}] writeReport returned invalid txHash`);
   const txHash = bytesToHex(writeReportResult.txHash);
+
   runtime.log(`[${chainName}] tx: ${txHash}`);
   return txHash;
 };
