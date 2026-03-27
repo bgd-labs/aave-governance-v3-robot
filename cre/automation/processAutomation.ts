@@ -28,10 +28,16 @@ export const processAutomation = (
       }),
     })
     .result();
+  const checkUpkeepData = bytesToHex(checkUpkeepCall.data);
+  if (checkUpkeepData === '0x') {
+    runtime.log(`[${chainName}] checkUpkeep(${automationAddress}): call returned empty data, skipping`);
+    return null;
+  }
+
   const checkUpkeepResult = decodeFunctionResult({
     abi: ICLAutomation,
     functionName: 'checkUpkeep',
-    data: bytesToHex(checkUpkeepCall.data),
+    data: checkUpkeepData,
   });
   runtime.log(`[${chainName}] checkUpkeep(${automationAddress}): ${checkUpkeepResult[0]}`);
 

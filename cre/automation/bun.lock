@@ -5,7 +5,7 @@
     "": {
       "name": "typescript-simple-template",
       "dependencies": {
-        "@chainlink/cre-sdk": "^1.5.0-alpha.1",
+        "@chainlink/cre-sdk": "^1.5.0-alpha.4",
       },
       "devDependencies": {
         "@types/bun": "1.2.21",
@@ -21,9 +21,9 @@
 
     "@bufbuild/protoplugin": ["@bufbuild/protoplugin@2.6.3", "", { "dependencies": { "@bufbuild/protobuf": "2.6.3", "@typescript/vfs": "^1.5.2", "typescript": "5.4.5" } }, "sha512-VceMuxeRukxGeABfo34SXq0VqY1MU+mzS+PBf0HAWo97ylFut8F6sQ3mV0tKiM08UQ/xQco7lxCn83BkoxrWrA=="],
 
-    "@chainlink/cre-sdk": ["@chainlink/cre-sdk@1.5.0-alpha.1", "", { "dependencies": { "@bufbuild/protobuf": "2.6.3", "@bufbuild/protoc-gen-es": "2.6.3", "@chainlink/cre-sdk-javy-plugin": "1.5.0-alpha.1", "@standard-schema/spec": "1.0.0", "viem": "2.34.0", "zod": "3.25.76" }, "bin": { "cre-compile": "bin/cre-compile.ts" } }, "sha512-LasuInoxOU3jwQuuY3MvrN+C9dalQcTSD8FXG8++O2gCAh9yacCMIrcJgmNDWeIhkPaWe7FithOVmVyS0rJYWA=="],
+    "@chainlink/cre-sdk": ["@chainlink/cre-sdk@1.5.0-alpha.4", "", { "dependencies": { "@bufbuild/protobuf": "2.6.3", "@bufbuild/protoc-gen-es": "2.6.3", "@chainlink/cre-sdk-javy-plugin": "1.5.0-alpha.4", "@standard-schema/spec": "1.0.0", "viem": "2.34.0", "zod": "3.25.76" }, "bin": { "cre-compile": "bin/cre-compile.ts" } }, "sha512-+EzrATryWxPy70i/Paps9K/jvCE9VlDS6OKTNIH//X0HVtGvL8NNWFuoLKFtR4lZHZOsr6s0aqMxWypknSJ0dQ=="],
 
-    "@chainlink/cre-sdk-javy-plugin": ["@chainlink/cre-sdk-javy-plugin@1.5.0-alpha.1", "", { "bin": { "cre-setup": "bin/setup.ts", "cre-compile-workflow": "bin/compile-workflow.ts" } }, "sha512-3vSUOE+2T9kfZkb4tSVL/yKFaakKw4w83uSPhfu/BZzxn9NhBcXzD3jSPbB7vOmL+gviQxd3tbbNmirfkZMNAg=="],
+    "@chainlink/cre-sdk-javy-plugin": ["@chainlink/cre-sdk-javy-plugin@1.5.0-alpha.4", "", { "bin": { "cre-setup": "bin/setup.ts", "cre-compile-workflow": "bin/compile-workflow.ts" } }, "sha512-S9VpHUREV7lIWfGNccG1A/38OKnAB/xDLY/eTvtt4CkQP6i7YDnYq7/Evx7aE3oFsYAGYhrdB6/unHeLj3F7+w=="],
 
     "@noble/ciphers": ["@noble/ciphers@1.3.0", "", {}, "sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw=="],
 
