@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 interface IKeeperRegistry {
   struct OnchainConfig {
-    uint32 paymentPremiumPPB;
+    uint32 paymentPremiumPpb;
     uint32 flatFeeMicroLink;
     uint32 checkGasLimit;
     uint24 stalenessSeconds;
@@ -72,7 +72,7 @@ interface IKeeperRegistry {
 
   function getBalance(uint256 id) external view returns (uint96 balance);
 
-  function getForwarder(uint256 upkeepID) external view returns (address);
+  function getForwarder(uint256 upkeepId) external view returns (address);
 
   function getLinkAddress() external view returns (address);
 

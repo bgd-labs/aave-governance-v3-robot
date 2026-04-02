@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
-import {Chainlink, ChainlinkClient, LinkTokenInterface} from 'chainlink/src/v0.8/ChainlinkClient.sol';
+import {Chainlink, ChainlinkClient} from 'chainlink/src/v0.8/ChainlinkClient.sol';
 
 import {IRootsConsumer} from '../interfaces/IRootsConsumer.sol';
 import {IDataWarehouse} from 'aave-governance-v3/src/contracts/voting/DataWarehouse.sol';
-import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 import {HexStringConverter} from './libraries/HexStringConverter.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {Rescuable, IRescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';

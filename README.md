@@ -12,22 +12,13 @@ Extensive documentation about the architecture and design of the system can be f
 
 All the information about the setup of the project and deployments can be found [HERE](./docs/setup.md).
 
-## Deployed addresses
+## Deployed Robots
 
-|  | Execution Chain Robot | Voting Chain Robot | Roots Consumer | Gov Chain Robot |
-| --- | --- | --- | --- | --- |
-| Ethereum | [0x365d47ceD3D7Eb6a9bdB3814aA23cc06B2D33Ef8](https://etherscan.io/address/0x365d47ceD3D7Eb6a9bdB3814aA23cc06B2D33Ef8) | [0x9aaB9F0b6E19907e346420Edc0d3029Edb5e8616](https://etherscan.io/address/0x9aaB9F0b6E19907e346420Edc0d3029Edb5e8616) | [0x2fa6f0a65886123afd24a575ae4554d0fce8b577](https://etherscan.io/address/0x2fa6f0a65886123afd24a575ae4554d0fce8b577) | [0x011824f238aee05329213d5ae029e899e5412343](https://etherscan.io/address/0x011824f238aee05329213d5ae029e899e5412343) |
-| Polygon | [0x249396a890F89D47F89326d7EE116b1d374Fb3A9](https://polygonscan.com/address/0x249396a890F89D47F89326d7EE116b1d374Fb3A9) | [0xbe7998712402B6A63975515A532Ce503437998b7](https://polygonscan.com/address/0xbe7998712402B6A63975515A532Ce503437998b7) | [0xe77af99210ac55939e1ba0bfc6a9a20e1da73b25](https://polygonscan.com/address/0xe77af99210ac55939e1ba0bfc6a9a20e1da73b25) | - |
-| Avalanche | [0x7B74938583Eb03e06042fcB651046BaF0bf15644](https://snowtrace.io/address/0x7B74938583Eb03e06042fcB651046BaF0bf15644) | [0x10E49034306EaA663646773C04b7B67E81eD0D52](https://snowtrace.io/address/0x10E49034306EaA663646773C04b7B67E81eD0D52) | [0x6264E51782D739caf515a1Bd4F9ae6881B58621b](https://snowtrace.io/address/0x6264E51782D739caf515a1Bd4F9ae6881B58621b) | - |
-| Arbitrum | [0x64093fe5f8cf62afb4377cf7ef4373537fe9155b](https://arbiscan.io/address/0x64093fe5f8cf62afb4377cf7ef4373537fe9155b) | - | - | - |
-| Optimism | [0xa0195539e21A6553243344A3BE6b874B5d3EC7b9](https://optimistic.etherscan.io/address/0xa0195539e21A6553243344A3BE6b874B5d3EC7b9) | - | - | - |
-| Bnb | [0x870F5EBf5C13B73251283b2d883988066e2bb732](https://bscscan.com/address/0x870F5EBf5C13B73251283b2d883988066e2bb732) | - | - | - |
-| Gnosis | [0xABcaf379C31626190F275f9a5Ba5d6ebf19F9903](https://gnosisscan.io/address/0xABcaf379C31626190F275f9a5Ba5d6ebf19F9903) | - | - | - |
-| Base | [0xdb93e2712a8B36835078f8D28c70fCC95FD6d37c](https://basescan.org/address/0xdb93e2712a8B36835078f8D28c70fCC95FD6d37c) | - | - | - |
+List of all the deployed robots could be found [HERE](https://github.com/bgd-labs/aave-robots-list).
 
 ## License
 
-Copyright © 2023, Aave DAO, represented by its governance smart contracts.
+Copyright © 2026, Aave DAO, represented by its governance smart contracts.
 
 Created by [BGD Labs](https://bgdlabs.com/).
 

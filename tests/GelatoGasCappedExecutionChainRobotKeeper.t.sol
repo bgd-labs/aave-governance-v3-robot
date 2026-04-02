@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
-import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {MiscMetis} from 'aave-address-book/MiscMetis.sol';
 import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
 import {GelatoGasCappedExecutionChainRobotKeeper} from '../src/contracts/gelato/GelatoGasCappedExecutionChainRobotKeeper.sol';
 import {IGasPriceCappedRobot} from '../src/interfaces/IGasPriceCappedRobot.sol';
-import './GasCappedExecutionChainRobotKeeper.t.sol';
+import {ExecutionChainRobotKeeper} from '../src/contracts/ExecutionChainRobotKeeper.sol';
+import {GasCappedExecutionChainRobotKeeper, GasCappedExecutionChainRobotKeeperTest, TransparentProxyFactory, Executor, PayloadsControllerMock, IPayloadsController, IPayloadsControllerCore, PayloadsControllerUtils} from './GasCappedExecutionChainRobotKeeper.t.sol';
 
 contract GelatoGasCappedExecutionChainRobotKeeperTest is GasCappedExecutionChainRobotKeeperTest {
   uint256 public constant NETWORK_GAS_PRICE = 100;
@@ -71,7 +71,7 @@ contract GelatoGasCappedExecutionChainRobotKeeperTest is GasCappedExecutionChain
       extraTime;
     vm.warp(skipTimeToTimelock);
 
-    assertEq(uint256(payload.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
+    assertEq(uint256(payload.state), uint256(IPayloadsController.PayloadState.Queued));
 
     bool didRobotRun = _checkAndPerformUpKeep(robotKeeper);
 
@@ -79,7 +79,7 @@ contract GelatoGasCappedExecutionChainRobotKeeperTest is GasCappedExecutionChain
 
     assertEq(
       uint256(payloadsController.getPayloadById(payloadId).state),
-      uint256(IPayloadsControllerCore.PayloadState.Queued)
+      uint256(IPayloadsController.PayloadState.Queued)
     );
   }
 

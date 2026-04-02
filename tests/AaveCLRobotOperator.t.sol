@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
-import {AaveCLRobotOperator, IKeeperRegistrar, IAaveCLRobotOperator, IKeeperRegistry} from '../src/contracts/AaveCLRobotOperator.sol';
+import {AaveCLRobotOperator, IKeeperRegistrar, IKeeperRegistry} from '../src/contracts/AaveCLRobotOperator.sol';
 import {ExecutionChainRobotKeeper} from '../src/contracts/ExecutionChainRobotKeeper.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
@@ -13,7 +13,7 @@ import {stdStorage, StdStorage} from 'forge-std/Test.sol';
 contract AaveCLRobotOperatorTest is Test {
   using stdStorage for StdStorage;
 
-  AaveCLRobotOperator public aaveCLRobotOperator;
+  AaveCLRobotOperator public aaveClRobotOperator;
 
   IERC20 constant LINK_TOKEN = IERC20(0x350a791Bfc2C21F9Ed5d10980Dad2e2638ffa7f6);
   address constant WITHDRAW_ADDRESS = address(2);
@@ -36,7 +36,7 @@ contract AaveCLRobotOperatorTest is Test {
       'optimism',
       132700949 // Mar-3-2025
     );
-    aaveCLRobotOperator = AaveCLRobotOperator(
+    aaveClRobotOperator = AaveCLRobotOperator(
       DeployRobotOperator._deploy(
         MiscOptimism.TRANSPARENT_PROXY_FACTORY,
         GovernanceV3Optimism.EXECUTOR_LVL_1,
@@ -53,7 +53,7 @@ contract AaveCLRobotOperatorTest is Test {
     (uint256 id, address upkeep) = _registerKeeper();
     IKeeperRegistry.UpkeepInfo memory upkeepInfo = IKeeperRegistry(REGISTRY).getUpkeep(id);
 
-    uint256[] memory registeredKeepers = aaveCLRobotOperator.getKeepersList();
+    uint256[] memory registeredKeepers = aaveClRobotOperator.getKeepersList();
 
     assertEq(registeredKeepers.length, 1);
     assertEq(registeredKeepers[0], id);
@@ -61,24 +61,24 @@ contract AaveCLRobotOperatorTest is Test {
     assertEq(upkeepInfo.performGas, 1000000);
     assertEq(upkeepInfo.checkData, abi.encode(address(1)));
     assertEq(upkeepInfo.balance, 100 ether);
-    assertEq(upkeepInfo.admin, address(aaveCLRobotOperator));
+    assertEq(upkeepInfo.admin, address(aaveClRobotOperator));
     assertTrue(upkeepInfo.maxValidBlocknumber > block.number);
     assertFalse(upkeepInfo.paused);
   }
 
   function testRegister_EventTypeKeeper() public {
     vm.startPrank(0x1B06E76bDA9d3721422c5ae5b3Fb2Edc29298BE3); // REGISTRAR_OWNER
-    IKeeperRegistrar(REGISTRAR).setAutoApproveAllowedSender(address(aaveCLRobotOperator), true);
+    IKeeperRegistrar(REGISTRAR).setAutoApproveAllowedSender(address(aaveClRobotOperator), true);
     vm.stopPrank();
 
     deal(address(LINK_TOKEN), GovernanceV3Optimism.EXECUTOR_LVL_1, 100 ether);
 
     vm.startPrank(GovernanceV3Optimism.EXECUTOR_LVL_1);
-    LINK_TOKEN.approve(address(aaveCLRobotOperator), 100 ether);
+    LINK_TOKEN.approve(address(aaveClRobotOperator), 100 ether);
     ExecutionChainRobotKeeper ethRobotKeeper = new ExecutionChainRobotKeeper(
       address(GovernanceV3Optimism.PAYLOADS_CONTROLLER)
     );
-    uint256 id = aaveCLRobotOperator.register(
+    uint256 id = aaveClRobotOperator.register(
       'testName',
       address(ethRobotKeeper),
       '',
@@ -99,9 +99,9 @@ contract AaveCLRobotOperatorTest is Test {
 
     vm.startPrank(GovernanceV3Optimism.EXECUTOR_LVL_1);
     deal(address(LINK_TOKEN), GovernanceV3Optimism.EXECUTOR_LVL_1, amountToFund);
-    LINK_TOKEN.approve(address(aaveCLRobotOperator), amountToFund);
+    LINK_TOKEN.approve(address(aaveClRobotOperator), amountToFund);
 
-    aaveCLRobotOperator.refillKeeper(id, amountToFund);
+    aaveClRobotOperator.refillKeeper(id, amountToFund);
     vm.stopPrank();
 
     IKeeperRegistry.UpkeepInfo memory updatedUpkeepInfo = IKeeperRegistry(REGISTRY).getUpkeep(id);
@@ -112,13 +112,13 @@ contract AaveCLRobotOperatorTest is Test {
     assertEq(LINK_TOKEN.balanceOf(WITHDRAW_ADDRESS), 0);
     (uint256 id, ) = _registerKeeper();
 
-    vm.startPrank(aaveCLRobotOperator.owner());
-    aaveCLRobotOperator.cancel(id);
+    vm.startPrank(aaveClRobotOperator.owner());
+    aaveClRobotOperator.cancel(id);
     vm.stopPrank();
 
     vm.roll(block.number + 100);
 
-    aaveCLRobotOperator.withdrawLink(id);
+    aaveClRobotOperator.withdrawLink(id);
     IKeeperRegistry.UpkeepInfo memory upkeepInfo = IKeeperRegistry(REGISTRY).getUpkeep(id);
 
     assertEq(upkeepInfo.balance, 0);
@@ -132,48 +132,48 @@ contract AaveCLRobotOperatorTest is Test {
     _registerKeeper();
     _registerKeeper();
 
-    assertEq(aaveCLRobotOperator.getKeepersList().length, 4);
+    assertEq(aaveClRobotOperator.getKeepersList().length, 4);
 
     vm.expectEmit();
-    emit KeeperCancelled(id, aaveCLRobotOperator.getKeeperInfo(id).upkeep);
+    emit KeeperCancelled(id, aaveClRobotOperator.getKeeperInfo(id).upkeep);
 
-    vm.startPrank(aaveCLRobotOperator.owner());
-    aaveCLRobotOperator.cancel(id);
+    vm.startPrank(aaveClRobotOperator.owner());
+    aaveClRobotOperator.cancel(id);
     vm.stopPrank();
 
-    uint256[] memory registeredKeepers = aaveCLRobotOperator.getKeepersList();
+    uint256[] memory registeredKeepers = aaveClRobotOperator.getKeepersList();
     for (uint256 index = 0; index < registeredKeepers.length; index++) {
       assertTrue(registeredKeepers[index] != id);
     }
 
-    assertEq(aaveCLRobotOperator.getKeepersList().length, 3);
+    assertEq(aaveClRobotOperator.getKeepersList().length, 3);
   }
 
   function testPause() public {
     (uint256 id, ) = _registerKeeper();
 
-    vm.startPrank(aaveCLRobotOperator.owner());
-    aaveCLRobotOperator.pause(id);
+    vm.startPrank(aaveClRobotOperator.owner());
+    aaveClRobotOperator.pause(id);
 
-    assertEq(aaveCLRobotOperator.isPaused(id), true);
+    assertEq(aaveClRobotOperator.isPaused(id), true);
 
-    aaveCLRobotOperator.unpause(id);
+    aaveClRobotOperator.unpause(id);
     vm.stopPrank();
 
-    assertEq(aaveCLRobotOperator.isPaused(id), false);
+    assertEq(aaveClRobotOperator.isPaused(id), false);
   }
 
   function testChangeGasLimit(uint32 gasLimit) public {
     vm.assume(gasLimit >= 10_000 && gasLimit <= 5_000_000);
     (uint256 id, ) = _registerKeeper();
 
-    vm.startPrank(aaveCLRobotOperator.guardian());
-    aaveCLRobotOperator.setGasLimit(id, gasLimit);
+    vm.startPrank(aaveClRobotOperator.guardian());
+    aaveClRobotOperator.setGasLimit(id, gasLimit);
     vm.stopPrank();
 
     vm.startPrank(address(6));
     vm.expectRevert(bytes('ONLY_BY_OWNER_OR_GUARDIAN'));
-    aaveCLRobotOperator.setGasLimit(id, gasLimit);
+    aaveClRobotOperator.setGasLimit(id, gasLimit);
     vm.stopPrank();
 
     IKeeperRegistry.UpkeepInfo memory upkeepInfo = IKeeperRegistry(REGISTRY).getUpkeep(id);
@@ -183,8 +183,8 @@ contract AaveCLRobotOperatorTest is Test {
   function testSetTriggerConfig() public {
     (uint256 id, ) = _registerKeeper();
 
-    vm.startPrank(aaveCLRobotOperator.owner());
-    aaveCLRobotOperator.setTriggerConfig(
+    vm.startPrank(aaveClRobotOperator.owner());
+    aaveClRobotOperator.setTriggerConfig(
       id,
       'abi encoded trigger config for event log type keeper only'
     );
@@ -197,30 +197,30 @@ contract AaveCLRobotOperatorTest is Test {
 
     vm.startPrank(address(6));
     vm.expectRevert(bytes('ONLY_BY_OWNER_OR_GUARDIAN'));
-    aaveCLRobotOperator.setTriggerConfig(id, '');
+    aaveClRobotOperator.setTriggerConfig(id, '');
     vm.stopPrank();
   }
 
   function testSetWithdrawAddress(address newWithdrawAddress) public {
-    vm.startPrank(aaveCLRobotOperator.owner());
-    aaveCLRobotOperator.setWithdrawAddress(newWithdrawAddress);
+    vm.startPrank(aaveClRobotOperator.owner());
+    aaveClRobotOperator.setWithdrawAddress(newWithdrawAddress);
     vm.stopPrank();
 
     vm.startPrank(address(10));
     vm.expectRevert(bytes('Ownable: caller is not the owner'));
-    aaveCLRobotOperator.setWithdrawAddress(newWithdrawAddress);
+    aaveClRobotOperator.setWithdrawAddress(newWithdrawAddress);
     vm.stopPrank();
 
-    assertEq(aaveCLRobotOperator.getWithdrawAddress(), newWithdrawAddress);
+    assertEq(aaveClRobotOperator.getWithdrawAddress(), newWithdrawAddress);
   }
 
   function testGetWithdrawAddress() public {
-    assertEq(aaveCLRobotOperator.getWithdrawAddress(), WITHDRAW_ADDRESS);
+    assertEq(aaveClRobotOperator.getWithdrawAddress(), WITHDRAW_ADDRESS);
   }
 
   function testGetKeeperInfo() public {
     (uint256 id, address upkeep) = _registerKeeper();
-    AaveCLRobotOperator.KeeperInfo memory keeperInfo = aaveCLRobotOperator.getKeeperInfo(id);
+    AaveCLRobotOperator.KeeperInfo memory keeperInfo = aaveClRobotOperator.getKeeperInfo(id);
     assertEq(keeperInfo.upkeep, upkeep);
     assertEq(keeperInfo.name, 'testName');
   }
@@ -230,11 +230,11 @@ contract AaveCLRobotOperatorTest is Test {
     deal(address(LINK_TOKEN), GovernanceV3Optimism.EXECUTOR_LVL_1, 100 ether);
 
     vm.startPrank(GovernanceV3Optimism.EXECUTOR_LVL_1);
-    LINK_TOKEN.approve(address(aaveCLRobotOperator), 100 ether);
+    LINK_TOKEN.approve(address(aaveClRobotOperator), 100 ether);
     ExecutionChainRobotKeeper ethRobotKeeper = new ExecutionChainRobotKeeper(
       address(GovernanceV3Optimism.PAYLOADS_CONTROLLER)
     );
-    uint256 id = aaveCLRobotOperator.register(
+    uint256 id = aaveClRobotOperator.register(
       'testName',
       address(ethRobotKeeper),
       abi.encode(address(1)),
@@ -253,30 +253,30 @@ contract AaveCLRobotOperatorTest is Test {
     vm.mockCall(
       OLD_REGISTRY,
       abi.encodeWithSelector(IKeeperRegistry.getLinkAddress.selector),
-      abi.encode(aaveCLRobotOperator.getLinkToken())
+      abi.encode(aaveClRobotOperator.getLinkToken())
     );
 
     // set to old registry so we can test migration to new registry
     vm.prank(GovernanceV3Optimism.EXECUTOR_LVL_1);
-    aaveCLRobotOperator.setRegistry(OLD_REGISTRY);
+    aaveClRobotOperator.setRegistry(OLD_REGISTRY);
 
     // modify and append keeperId on _keepers, this is mock an already registered keeper to be registered by
     // the robot operator contract in order to test migration it to new registry
     uint256 id = 38016904744371718141567798635089231439311935855515862823520872759101042183005;
     uint256 arrayLength = 1;
     uint256 keepersStorageSlot = 2;
-    vm.store(address(aaveCLRobotOperator), bytes32(keepersStorageSlot), bytes32(arrayLength));
+    vm.store(address(aaveClRobotOperator), bytes32(keepersStorageSlot), bytes32(arrayLength));
     vm.store(
-      address(aaveCLRobotOperator),
+      address(aaveClRobotOperator),
       bytes32(_arrayLocation(keepersStorageSlot, 0)),
       bytes32(id)
     );
 
     // transfer ownership of a registered keeper to the robot operator contract
     vm.prank(0x7cbe7B1E715762F19308A29961dbe9E4bEeD5ba4);
-    IKeeperRegistry(OLD_REGISTRY).transferUpkeepAdmin(id, address(aaveCLRobotOperator));
+    IKeeperRegistry(OLD_REGISTRY).transferUpkeepAdmin(id, address(aaveClRobotOperator));
 
-    vm.prank(address(aaveCLRobotOperator));
+    vm.prank(address(aaveClRobotOperator));
     IKeeperRegistry(OLD_REGISTRY).acceptUpkeepAdmin(id);
 
     uint256[] memory idsToMigrate = new uint256[](1);
@@ -286,7 +286,7 @@ contract AaveCLRobotOperatorTest is Test {
     emit KeepersMigrated(idsToMigrate, REGISTRY, REGISTRAR);
 
     vm.prank(GovernanceV3Optimism.EXECUTOR_LVL_1);
-    aaveCLRobotOperator.migrate(REGISTRY, REGISTRAR);
+    aaveClRobotOperator.migrate(REGISTRY, REGISTRAR);
   }
 
   function _arrayLocation(uint256 slot, uint256 index) public pure returns (uint256) {

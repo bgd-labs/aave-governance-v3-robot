@@ -2,12 +2,15 @@
 pragma solidity ^0.8.0;
 
 import {GasCappedGovernanceChainRobotKeeper} from '../src/contracts/gasprice-capped-robots/GasCappedGovernanceChainRobotKeeper.sol';
-import {GovernanceChainRobotKeeperTest} from './GovernanceChainRobotKeeper.t.sol';
+import {GovernanceChainRobotKeeperTest, IGovernancePowerStrategy} from './GovernanceChainRobotKeeper.t.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {MockAggregator} from 'chainlink/src/v0.8/mocks/MockAggregator.sol';
-import 'aave-governance-v3/tests/GovernanceCore.t.sol';
+import {IGovernanceCore} from 'aave-governance-v3/tests/GovernanceCore.t.sol';
 
 contract GasCappedGovernanceChainRobotKeeperTest is GovernanceChainRobotKeeperTest {
+  address public constant VOTING_PORTAL_ETH_ETH = 0x9b24C168d6A76b5459B1d47071a54962a4df36c3;
+  address public constant CHAINLINK_FAST_GAS_FEED = 0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C;
+
   MockAggregator public chainLinkFastGasFeed;
 
   event MaxGasPriceSet(uint256 indexed maxGasPrice);
@@ -17,10 +20,10 @@ contract GasCappedGovernanceChainRobotKeeperTest is GovernanceChainRobotKeeperTe
 
     CROSS_CHAIN_CONTROLLER = GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER;
     POWER_STRATEGY = address(GovernanceV3Ethereum.GOVERNANCE_POWER_STRATEGY);
-    VOTING_PORTAL = GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL;
+    VOTING_PORTAL = VOTING_PORTAL_ETH_ETH;
 
     governance = IGovernanceCore(address(GovernanceV3Ethereum.GOVERNANCE));
-    chainLinkFastGasFeed = MockAggregator(0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C);
+    chainLinkFastGasFeed = MockAggregator(CHAINLINK_FAST_GAS_FEED);
 
     vm.startPrank(GUARDIAN);
     robotKeeper = new GasCappedGovernanceChainRobotKeeper(address(governance), address(chainLinkFastGasFeed));

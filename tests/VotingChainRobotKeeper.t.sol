@@ -5,7 +5,7 @@ import {VotingChainRobotKeeper} from '../src/contracts/VotingChainRobotKeeper.so
 import {RootsConsumer, IRootsConsumer} from '../src/contracts/RootsConsumer.sol';
 import {LinkTokenInterface} from 'chainlink/src/v0.8/ChainlinkClient.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
-import 'aave-governance-v3/tests/voting/votingMachineWithProofs.t.sol';
+import {Test, DataWarehouse, IDataWarehouse, VotingStrategy, IVotingStrategy, IVotingMachineWithProofs, VotingMachine} from 'aave-governance-v3/tests/voting/votingMachineWithProofs.t.sol';
 
 contract VotingChainRobotKeeperTest is Test {
   VotingChainRobotKeeper robotKeeper;

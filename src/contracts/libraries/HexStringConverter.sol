@@ -12,6 +12,7 @@ library HexStringConverter {
    * @param data bytes32 data to convert to hex string
    */
   function toHexString(bytes32 data) public pure returns (string memory) {
+    // forge-lint: disable-next-line(unsafe-typecast)
     return string(abi.encodePacked('0x', _toHex16(bytes16(data)), _toHex16(bytes16(data << 128))));
   }
 
