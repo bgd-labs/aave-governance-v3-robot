@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Script} from 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
-import '../src/contracts/VotingChainRobotKeeper.sol';
+import {VotingChainRobotKeeper} from '../src/contracts/VotingChainRobotKeeper.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';

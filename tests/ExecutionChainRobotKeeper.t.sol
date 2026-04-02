@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {ExecutionChainRobotKeeper} from '../src/contracts/ExecutionChainRobotKeeper.sol';
-import 'aave-governance-v3/tests/payloads/PayloadsControllerCore.t.sol';
+import {Test, TransparentProxyFactory, PayloadsControllerMock, PayloadTest, IExecutor, IPayloadsControllerCore, PayloadsControllerUtils, Executor, Ownable} from 'aave-governance-v3/tests/payloads/PayloadsControllerCore.t.sol';
 
 contract ExecutionChainRobotKeeperTest is Test {
   address public constant PAYLOAD_PORTAL = address(987312);

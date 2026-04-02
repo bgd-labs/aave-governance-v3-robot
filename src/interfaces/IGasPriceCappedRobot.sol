@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {AggregatorInterface} from 'aave-address-book/AaveV3.sol';
-
 /**
  * @title IGasPriceCappedRobot
  * @author BGD Labs

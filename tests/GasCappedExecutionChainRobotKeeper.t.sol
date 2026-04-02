@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
-import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GasCappedExecutionChainRobotKeeper} from '../src/contracts/gasprice-capped-robots/GasCappedExecutionChainRobotKeeper.sol';
-import {GovV3StorageHelpers, StorageHelpers, IPayloadsControllerCore as IPayloadsController, PayloadsControllerUtils as PayloadsUtils} from 'aave-helpers/GovV3Helpers.sol';
+import {GovV3StorageHelpers, IPayloadsControllerCore as IPayloadsController, PayloadsControllerUtils as PayloadsUtils} from 'aave-helpers/GovV3Helpers.sol';
 import {MockAggregator} from 'chainlink/src/v0.8/mocks/MockAggregator.sol';
-import './ExecutionChainRobotKeeper.t.sol';
+import {ExecutionChainRobotKeeperTest, Executor, PayloadsControllerMock, TransparentProxyFactory, PayloadTest, IPayloadsControllerCore, PayloadsControllerUtils} from './ExecutionChainRobotKeeper.t.sol';
 
 contract GasCappedExecutionChainRobotKeeperTest is ExecutionChainRobotKeeperTest {
   address public constant GUARDIAN = address(1);
@@ -16,7 +15,7 @@ contract GasCappedExecutionChainRobotKeeperTest is ExecutionChainRobotKeeperTest
   event MaxGasPriceSet(uint256 indexed maxGasPrice);
 
   function setUp() virtual public override {
-    vm.createSelectFork('mainnet', 19609260); // Apr-8-2024
+    vm.createSelectFork('mainnet', 24791785); // Apr-8-2024
 
     proxyFactory = TransparentProxyFactory(MiscEthereum.TRANSPARENT_PROXY_FACTORY);
     shortExecutor = Executor(payable(GovernanceV3Ethereum.EXECUTOR_LVL_1));
@@ -94,7 +93,7 @@ contract GasCappedExecutionChainRobotKeeperTest is ExecutionChainRobotKeeperTest
       extraTime;
     vm.warp(skipTimeToTimelock);
 
-    assertEq(uint256(payload.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
+    assertEq(uint256(payload.state), uint256(IPayloadsController.PayloadState.Queued));
 
     bool didRobotRun = _checkAndPerformUpKeep(robotKeeper);
 
@@ -102,7 +101,7 @@ contract GasCappedExecutionChainRobotKeeperTest is ExecutionChainRobotKeeperTest
 
     assertEq(
       uint256(payloadsController.getPayloadById(payloadId).state),
-      uint256(IPayloadsControllerCore.PayloadState.Queued)
+      uint256(IPayloadsController.PayloadState.Queued)
     );
   }
 

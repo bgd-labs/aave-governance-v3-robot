@@ -1,0 +1,29 @@
+{
+  "lib/aave-governance-v3": {
+    "rev": "0c14d60ac89d7a9f79d0a1f77de5c99c3ba1201f"
+  },
+  "lib/aave-helpers": {
+    "branch": {
+      "name": "main",
+      "rev": "0d0a8a89e97b2b715c456d0bb23171a51034e9ab"
+    }
+  },
+  "lib/chainlink": {
+    "branch": {
+      "name": "v1.13.0",
+      "rev": "594387e4795adeed7fd32893dfecc7ae04b987ed"
+    }
+  },
+  "lib/forge-std": {
+    "rev": "2f6762e4f73f3d835457c220b5f62dfeeb6f6341"
+  },
+  "lib/openzeppelin-contracts": {
+    "branch": {
+      "name": "v4.8.2",
+      "rev": "d00acef4059807535af0bd0dd0ddf619747a044b"
+    }
+  },
+  "lib/solidity-utils": {
+    "rev": "cd520ddb05c0267370a33339bc9c4fc3c573d79a"
+  }
+}

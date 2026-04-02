@@ -3,16 +3,15 @@ pragma solidity ^0.8.0;
 
 import {RootsConsumer} from '../src/contracts/RootsConsumer.sol';
 import {DataWarehouse} from 'aave-governance-v3/src/contracts/voting/DataWarehouse.sol';
-import {LinkTokenInterface} from 'chainlink/src/v0.8/ChainlinkClient.sol';
 import {MockLinkToken} from 'chainlink/test/v0.8/foundry/dev/special/MockLinkToken.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
-import 'forge-std/Test.sol';
+import {Test} from 'forge-std/Test.sol';
 
 contract RootsConsumerTest is Test {
   DataWarehouse dataWarehouse;
-  MockLinkToken LINK_TOKEN;
+  MockLinkToken linkToken;
 
   address constant CHAINLINK_OPERATOR = address(12);
   address constant WITHDRAWAL_ADDRESS = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
@@ -27,10 +26,10 @@ contract RootsConsumerTest is Test {
   RootsConsumer rootsConsumer;
 
   function setUp() public {
-    LINK_TOKEN = new MockLinkToken();
+    linkToken = new MockLinkToken();
     dataWarehouse = new DataWarehouse();
     rootsConsumer = new RootsConsumer(
-      address(LINK_TOKEN),
+      address(linkToken),
       CHAINLINK_OPERATOR,
       address(5),
       '999f64aab86b48739da48db1d1de0ac5',
@@ -101,14 +100,15 @@ contract RootsConsumerTest is Test {
   }
 
   function testWithdrawLink(uint256 amount) public {
-    vm.assume(amount < LINK_TOKEN.totalSupply());
-    LINK_TOKEN.transfer(address(rootsConsumer), amount);
-    uint256 ownerBalanceBefore = LINK_TOKEN.balanceOf(WITHDRAWAL_ADDRESS);
+    vm.assume(amount < linkToken.totalSupply());
+    bool status = linkToken.transfer(address(rootsConsumer), amount);
+    assertTrue(status);
+    uint256 ownerBalanceBefore = linkToken.balanceOf(WITHDRAWAL_ADDRESS);
 
-    rootsConsumer.emergencyTokenTransfer(address(LINK_TOKEN), WITHDRAWAL_ADDRESS, amount);
-    uint256 ownerBalanceAfter = LINK_TOKEN.balanceOf(WITHDRAWAL_ADDRESS);
+    rootsConsumer.emergencyTokenTransfer(address(linkToken), WITHDRAWAL_ADDRESS, amount);
+    uint256 ownerBalanceAfter = linkToken.balanceOf(WITHDRAWAL_ADDRESS);
 
-    assertEq(LINK_TOKEN.balanceOf(address(rootsConsumer)), 0);
+    assertEq(linkToken.balanceOf(address(rootsConsumer)), 0);
     assertEq(ownerBalanceAfter - ownerBalanceBefore, amount);
   }
 

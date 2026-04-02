@@ -7,7 +7,6 @@ import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
-import {AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 
 contract DeployFuji is Script {
   function run() external {

@@ -9,9 +9,6 @@
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
 	branch = v4.8.2
-[submodule "lib/aave-address-book"]
-	path = lib/aave-address-book
-	url = https://github.com/bgd-labs/aave-address-book
 [submodule "lib/aave-governance-v3"]
 	path = lib/aave-governance-v3
 	url = https://github.com/bgd-labs/aave-governance-v3
@@ -20,5 +17,5 @@
 	url = https://github.com/bgd-labs/solidity-utils
 [submodule "lib/aave-helpers"]
 	path = lib/aave-helpers
-	url = https://github.com/bgd-labs/aave-helpers
-	branch = master
+	url = https://github.com/aave-dao/aave-helpers
+	branch = main

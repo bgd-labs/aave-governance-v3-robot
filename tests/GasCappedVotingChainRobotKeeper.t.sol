@@ -2,15 +2,21 @@
 pragma solidity ^0.8.0;
 
 import {GasCappedVotingChainRobotKeeper} from '../src/contracts/gasprice-capped-robots/GasCappedVotingChainRobotKeeper.sol';
-import {RootsConsumer, IRootsConsumer} from '../src/contracts/RootsConsumer.sol';
+import {RootsConsumer} from '../src/contracts/RootsConsumer.sol';
 import {LinkTokenInterface} from 'chainlink/src/v0.8/ChainlinkClient.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {MockAggregator} from 'chainlink/src/v0.8/mocks/MockAggregator.sol';
 import {IBaseReceiverPortal} from 'aave-address-book/governance-v3/IBaseReceiverPortal.sol';
 import {IVotingPortal} from 'aave-address-book/governance-v3/IVotingPortal.sol';
-import './VotingChainRobotKeeper.t.sol';
+import {VotingChainRobotKeeperTest, DataWarehouse, IDataWarehouse, VotingStrategy, VotingMachine, IVotingStrategy} from './VotingChainRobotKeeper.t.sol';
 
 contract GasCappedVotingChainRobotKeeperTest is VotingChainRobotKeeperTest {
+  address public constant DATA_WAREHOUSE = 0x1699FE9CaDC8a0b6c93E06B62Ab4592a0fFEcF61;
+  address public constant VOTING_STRATEGY = 0x5642A5A5Ec284B4145563aBF319620204aCCA7f4;
+  address public constant VOTING_MACHINE = 0x617332a777780F546261247F621051d0b98975Eb;
+  address public constant L1_VOTING_PORTAL = 0xf23f7De3AC42F22eBDA17e64DC4f51FB66b8E21f;
+  address public constant CHAINLINK_FAST_GAS_FEED = 0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C;
+
   MockAggregator public chainLinkFastGasFeed;
 
   event MaxGasPriceSet(uint256 indexed maxGasPrice);
@@ -18,9 +24,9 @@ contract GasCappedVotingChainRobotKeeperTest is VotingChainRobotKeeperTest {
   function setUp() public override {
     vm.createSelectFork('mainnet', 19609260); // Apr-8-2024
 
-    rootsWarehouse = DataWarehouse(address(GovernanceV3Ethereum.DATA_WAREHOUSE));
-    votingStrategy = VotingStrategy(address(GovernanceV3Ethereum.VOTING_STRATEGY));
-    votingMachine = VotingMachine(address(GovernanceV3Ethereum.VOTING_MACHINE));
+    rootsWarehouse = DataWarehouse(DATA_WAREHOUSE);
+    votingStrategy = VotingStrategy(VOTING_STRATEGY);
+    votingMachine = VotingMachine(VOTING_MACHINE);
 
     vm.startPrank(GUARDIAN);
     rootsConsumer = new RootsConsumer(
@@ -33,7 +39,7 @@ contract GasCappedVotingChainRobotKeeperTest is VotingChainRobotKeeperTest {
       ''
     );
 
-    chainLinkFastGasFeed = MockAggregator(0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C);
+    chainLinkFastGasFeed = MockAggregator(CHAINLINK_FAST_GAS_FEED);
     robotKeeper = new GasCappedVotingChainRobotKeeper(address(votingMachine), address(rootsConsumer), address(chainLinkFastGasFeed));
     GasCappedVotingChainRobotKeeper(address(robotKeeper)).setMaxGasPrice(
       uint256(chainLinkFastGasFeed.latestAnswer())
@@ -111,7 +117,7 @@ contract GasCappedVotingChainRobotKeeperTest is VotingChainRobotKeeperTest {
     bytes memory message = abi.encode(proposalId, blockHash, votingDuration);
 
     IBaseReceiverPortal(address(votingMachine)).receiveCrossChainMessage(
-      GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH,
+      L1_VOTING_PORTAL,
       1,
       abi.encode(IVotingPortal.MessageType.Proposal, message)
     );
@@ -124,7 +130,7 @@ contract GasCappedVotingChainRobotKeeperTest is VotingChainRobotKeeperTest {
     bytes memory message = abi.encode(proposalId, blockHash, 6000);
 
     IBaseReceiverPortal(address(votingMachine)).receiveCrossChainMessage(
-      GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH,
+      L1_VOTING_PORTAL,
       1,
       abi.encode(IVotingPortal.MessageType.Proposal, message)
     );
@@ -142,7 +148,7 @@ contract GasCappedVotingChainRobotKeeperTest is VotingChainRobotKeeperTest {
     bytes memory message = abi.encode(proposalId, blockHash, votingDuration);
 
     IBaseReceiverPortal(address(votingMachine)).receiveCrossChainMessage(
-      GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH,
+      L1_VOTING_PORTAL,
       1,
       abi.encode(IVotingPortal.MessageType.Proposal, message)
     );

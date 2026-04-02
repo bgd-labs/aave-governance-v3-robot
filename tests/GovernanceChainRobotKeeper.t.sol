@@ -2,16 +2,17 @@
 pragma solidity ^0.8.0;
 
 import {GovernanceChainRobotKeeper} from '../src/contracts/GovernanceChainRobotKeeper.sol';
-import 'aave-governance-v3/tests/GovernanceCore.t.sol';
+import {Test, IGovernanceCore, TransparentProxyFactory, PayloadsControllerUtils, Governance, IBaseVotingStrategy, IGovernance, IGovernancePowerStrategy, IVotingPortal, ICrossChainForwarder, ChainIds} from 'aave-governance-v3/tests/GovernanceCore.t.sol';
 
 contract GovernanceChainRobotKeeperTest is Test {
   address public CROSS_CHAIN_CONTROLLER = address(123456);
   address public POWER_STRATEGY = address(123456789);
   address public VOTING_PORTAL = address(1230123);
-  uint256 public EXECUTION_GAS_LIMIT = 400000;
-  uint256 public COOLDOWN_PERIOD = 1 days;
-  uint256 public CANCELLATION_FEE = 0.05 ether;
-  address public CANCELLATION_FEE_COLLECTOR = address(123404321);
+
+  uint256 public constant EXECUTION_GAS_LIMIT = 400000;
+  uint256 public constant COOLDOWN_PERIOD = 1 days;
+  uint256 public constant CANCELLATION_FEE = 0.05 ether;
+  address public constant CANCELLATION_FEE_COLLECTOR = address(123404321);
   address public constant GUARDIAN = address(1);
 
   IGovernanceCore public governance;
