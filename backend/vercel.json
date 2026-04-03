@@ -1,9 +1,0 @@
-{
-  "routes": [
-    {
-      "src": "/api/roots",
-      "methods": ["GET"],
-      "dest": "/api/StorageRoots.ts"
-    }
-  ]
-}
