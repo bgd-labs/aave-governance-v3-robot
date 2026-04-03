@@ -157,7 +157,7 @@ _Note: The Robot Operator contract is configured to be upgradable by the governa
 
   Called by the governance level 1 executor (owner) to set the new chainlink registrar contract.
 
-## API Consumer Contract:
+## API Consumer Contract (Deprecated):
 
 The chainlink API consumer-compatible smart contracts are deployed on the voting chain networks to request data off-chain by calling the respective APIs to register the roots for the voting tokens.
 
@@ -172,3 +172,5 @@ The consumer contract contains the following functions:
   This function is a callback function called by the chainlink node operators containing the response from the API requested. The response includes the call data containing the roots of voting tokens from the governance chain in the form of call data for the following functions of the DataWarehouse contract: `processStorageRoot()`, `processStorageSlot()`
 
   Using the call data response returned, this function then registers the roots of the above functions on the data warehouse contract.
+
+Use of Chainlink API to submit storage roots has been deprecated and migrated to Chainlink CRE now, see more [here](../cre/gov-storage-roots/README.md).

@@ -5,6 +5,36 @@ import {Script} from 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
 import {MailboxCRE} from '../src/contracts/MailboxCRE.sol';
 
+// make deploy-ledger contract=scripts/MailboxCRE.s.sol:DeployEthereum chain=mainnet
+contract DeployEthereum is Script {
+  function run() external {
+    vm.startBroadcast();
+    MailboxCRE mailbox = new MailboxCRE();
+    console.log('MailboxCRE ethereum address', address(mailbox));
+    vm.stopBroadcast();
+  }
+}
+
+// make deploy-ledger contract=scripts/MailboxCRE.s.sol:DeployPolygon chain=polygon
+contract DeployPolygon is Script {
+  function run() external {
+    vm.startBroadcast();
+    MailboxCRE mailbox = new MailboxCRE();
+    console.log('MailboxCRE polygon address', address(mailbox));
+    vm.stopBroadcast();
+  }
+}
+
+// make deploy-ledger contract=scripts/MailboxCRE.s.sol:DeployAvalanche chain=avalanche
+contract DeployAvalanche is Script {
+  function run() external {
+    vm.startBroadcast();
+    MailboxCRE mailbox = new MailboxCRE();
+    console.log('MailboxCRE avalanche address', address(mailbox));
+    vm.stopBroadcast();
+  }
+}
+
 // make deploy-ledger contract=scripts/MailboxCRE.s.sol:DeployGnosis chain=gnosis
 contract DeployGnosis is Script {
   function run() external {
